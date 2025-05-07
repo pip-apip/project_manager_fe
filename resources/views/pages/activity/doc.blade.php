@@ -230,196 +230,183 @@
     $categoryDoc = $data['categoryDoc'];
 @endphp
 
-{{-- <div class="page-title">
-    <div class="row">
-        <div class="col-12 col-md-6 order-md-1 order-last">
-            <a href="{{ route('activity.index') }}"><i class="fa-solid fa-arrow-left"></i></a>
-            <h3>Activity Detail</h3>
-            <p class="text-subtitle text-muted">For user to check they list</p>
-        </div>
-        <div class="col-12 col-md-6 order-md-2 order-first">
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Aktivitas</li>
-                    <li class="breadcrumb-item active" aria-current="page">Dokumen</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
-</div> --}}
+
 @php
     $lastRoute = session()->get('lastRoute');
     $lastRoute = $lastRoute ? explode(',', $lastRoute) : [];
 @endphp
 
-<section class="section">
-    <div class="card">
-        <div class="card-header">
-            <div class="row">
-                <div class="col-sm-8 col-8">
-                    <h1>Dokumen <span class="d-none d-md-inline-block">Aktivitas</span></h1>
+<div class="page-heading">
+    <div class="page-content">
+        <section id="basic-horizontal-layouts">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-8 col-8">
+                            <h1>Detail <span class="d-none d-md-inline-block">Aktivitas</span></h1>
+                        </div>
+                        <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
+                            <a href="{{ isset($lastRoute[0], $lastRoute[1]) ? route($lastRoute[0], $lastRoute[1]) : route('activity.index') }}" class="btn btn-secondary btn-sm">
+                                <i class="fa-solid fa-angle-left"></i> <span class="d-none d-md-inline-block">Kembali</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
-                    <a href="{{ isset($lastRoute[0], $lastRoute[1]) ? route($lastRoute[0], $lastRoute[1]) : '#' }}" class="btn btn-secondary btn-sm">
-                        <i class="fa-solid fa-angle-left"></i> <span class="d-none d-md-inline-block">Kembali</span>
-                    </a>
+                <div class="card-body">
+                    <form class="form form-vertical">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Nama Proyek</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" value="{{ $activity['project_name'] }}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Tanggal</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" value="{{ \Carbon\Carbon::parse($activity['start_date'])->translatedFormat('d-m-Y') }}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Kategori Aktivitas</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" value="{{ $activity['activity_category_name'] }}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Catatan Aktivitas</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" value="{{ $activity['title'] }}" readonly />
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </div>
-
-        <div class="card-body">
-            <label><b> Nama Aktivitas : </b></label>
-            <div class="form-group">
-                <p class="form-control-static" id="project_name_detail">{{ $activity['title'] }}</p>
-            </div>
-            <label><b> Kategori : </b></label>
-            <div class="form-group">
-                <p class="form-control-static" id="category_activity_detail">{{ $activity['activity_category_name'] }}</p>
-            </div>
-            {{-- @if(count($doc) == 0) --}}
-            {{-- <fieldset class="form-group">
-                <select class="form-select" id="documentCat1">
-                    <option value="#">Pilih Kategori</option>
-                    @foreach ($categoryDoc as $cat)
-                    <option value="{{ $cat['id'] }}">{{ $cat['name'] }}</option>
-                    @endforeach
-                </select>
-            </fieldset> --}}
-            {{-- @else
-            <fieldset class="form-group">
-                <select class="form-select" id="documentCat2" disabled>
-                    <option value="#">Pilih Kategori</option>
-                    @foreach ($categoryDoc as $cat)
-                    <option value="{{ $cat['id'] }}" {{ $cat['id'] == $doc[0]['activity_doc_category_id'] ? 'selected' : '' }}>{{ $cat['name'] }}</option>
-                    @endforeach
-                </select>
-            </fieldset>
-            @endif --}}
-        </div>
+        </section>
     </div>
-</section>
+</div>
 
-<section class="section" id="form_MOM" style="display: none">
-    <div class="card">
-        {{-- <div class="card-header text-right">
-            <h1>Document Activity</h1>
-        </div> --}}
-        <div class="card-body">
-            <form action="" id="form">
-                @csrf
-                <input type="text" name="activity_id" id="activity_id" hidden>
-                {{-- <input type="text" name="doc_id" id="doc_id" > --}}
-                <label>Judul Dokumen :</label>
-                <div class="form-group">
-                    <input type="text" placeholder="Masukkan Judul Dokumen Kegiatan" class="form-control" name="title" id="title_activity_doc">
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <label>Deskripsi : </label>
-                        <div id="quillEditor">
-                            {{-- <p>Hello World!</p>
-                            <p>Some initial <strong>bold</strong> text</p>
-                            <p><br /></p> --}}
+<div class="page-heading">
+    <div class="page-content">
+        <section class="section">
+            <div class="row">
+                <div class="col-sm-12" id="tagsSearch">
+                    <div class="card">
+                        <div class="card-header">
+                            <h1 class="card-title">Dokumen Aktivitas</h1>
                         </div>
-                    </div>
-                    <div class="col-sm-12 tags-form">
-                        <label>Tags : </label>
-                        <div class="form-group">
-                            <input type="text" class="form-control" id="tagInput" placeholder="Ketik dan Tekan Enter..." name="tags"/>
-                        </div>
-                        <div class="tag-container" id="tags">
-                        </div>
-                        <hr>
-                    </div>
+                        <div class="card-body" id="form_MOM" style="display: none">
+                            <form action="" id="form" class="form form-vertical">
+                                @csrf
+                                <input type="text" name="activity_id" id="activity_id" hidden>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>Judul Dokumen <code>*</code></label>
+                                    </div>
+                                    <div class="form-group col-md-10">
+                                        <input type="text" placeholder="Masukkan Judul Dokumen Kegiatan" class="form-control" name="title" id="title_activity_doc">
+                                    </div>
 
-                    <div class="col-sm-12">
-                        <label>Dokumentasi</label>
-                        <div class="file-upload-wrapper" id="dropzone">
-                            <label for="file-upload" class="file-upload-area @error('file') is-invalid @enderror">
-                                <div class="upload-text" id="upload-text">
-                                    Drag & Drop your files or <span class="browse">Browse</span>
+                                    <div class="col-md-2">
+                                        <label>Deskripsi <code>*</code></label>
+                                    </div>
+                                    <div class="form-group col-md-10">
+                                        <div id="quillEditor" style="height: 300px;"></div>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label>Tags <code>*</code></label>
+                                    </div>
+                                    <div class="form-group col-md-10">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="tagInput" placeholder="Ketik dan Tekan Enter..." name="tags"/>
+                                        </div>
+                                        <div class="tag-container" id="tags"></div>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label>Berkas Dokumentasi</label>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="file-upload-wrapper" id="dropzone">
+                                            <label for="file-upload" class="file-upload-area @error('file') is-invalid @enderror">
+                                                <div class="upload-text" id="upload-text">
+                                                    Drag & Drop your files or <span class="browse">Browse</span>
+                                                </div>
+                                                <input type="file" id="file-upload" name="file[]" multiple />
+                                                <div class="file-preview" id="file-preview" style="display: none;"></div>
+                                            </label>
+                                        </div>
+
+                                        @error('file')
+                                        <small class="file-error-text" style="color: #e74c3c;" id="file-error">
+                                            {{ $message }}
+                                        </small>
+                                        @enderror
+                                    </div>
+                                    <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
+                                        <button type="submit"
+                                            class="btn btn-primary me-1 mb-1">Simpan</button>
+                                        <button type="reset"
+                                            class="btn btn-light-secondary me-1 mb-1">Batal</button>
+                                    </div>
                                 </div>
-                                <input type="file" id="file-upload" name="file[]" multiple />
-                                <div class="file-preview" id="file-preview" style="display: none;"></div>
-                            </label>
+                            </form>
                         </div>
-
-                        @error('file')
-                        <small class="file-error-text" style="color: #e74c3c;" id="file-error">
-                            {{ $message }}
-                        </small>
-                        @enderror
+                        <div class="card-body" id="show_MOM" style="display: none">
+                            <label><b>Judul Dokumen :</b></label>
+                            <div class="form-group">
+                                <p class="form-control-static" id="title_show"></p>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <label><b>Deskripsi : </b></label>
+                                    <div class="form-group">
+                                        <div class="form-control-static" id="desc_show"></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 mb-3">
+                                    <label><b>Tags : </b></label>
+                                    <div class="tag-container" id="tags_show">
+                                    </div>
+                                </div>
+                                {{-- @if ($data['docActivity'] !== []) --}}
+                                <div class="col-sm-12">
+                                    <label><b>Dokumentasi :</b></label>
+                                    <table style="width: 100%">
+                                        <tr>
+                                            @if($data['docActivity'] !== [])
+                                            @php $url = "https://bepm.hanatekindo.com"; $i = 0; @endphp
+                                            @foreach ($data['docActivity'][0]['files'] as $doc)
+                                                <td style="text-align: center;">
+                                                    <a onclick="openModernModal('{{ $url . $doc }}')" style="text-decoration: none; color: grey; font-size: 40px; cursor: pointer">
+                                                        <i class="fa-solid fa-file-image"></i>
+                                                    </a>
+                                                </td>
+                                            @endforeach
+                                            @endif
+                                        </tr>
+                                        <tr>
+                                            @if($data['docActivity'] !== [])
+                                            @foreach ($data['docActivity'][0]['files'] as $doc)
+                                                <td style="text-align: center;">Dokumentasi {{ $i+1 }}</td>
+                                                @php $i++; @endphp
+                                            @endforeach
+                                            @endif
+                                        </tr>
+                                    </table>
+                                </div>
+                                {{-- @endif --}}
+                            </div>
+                        </div>
                     </div>
-
                 </div>
-                <button class="btn btn-primary ml-1 mt-3" type="button" onclick="storeDoc()" id="saveButton">
-                    <i class="bx bx-check d-block d-sm-none"></i>
-                    <span class="d-none d-sm-block"><i class="fa-solid fa-floppy-disk"></i> Simpan</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</section>
-
-<section class="section" id="show_MOM" style="display: none">
-    <div class="card">
-        {{-- <div class="card-header text-right">
-            <h1>Document Activity</h1>
-        </div> --}}
-        <div class="card-body">
-            <label><b>Judul Dokumen :</b></label>
-            <div class="form-group">
-                <p class="form-control-static" id="title_show"></p>
             </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <label><b>Deskripsi : </b></label>
-                    <div class="form-group">
-                        <div class="form-control-static" id="desc_show"></div>
-                    </div>
-                </div>
-                <div class="col-sm-12 mb-3">
-                    <label><b>Tags : </b></label>
-                    <div class="tag-container" id="tags_show">
-                    </div>
-                </div>
-                {{-- @if ($data['docActivity'] !== []) --}}
-                <div class="col-sm-12">
-                    <label><b>Dokumentasi :</b></label>
-                    <table style="width: 100%">
-                        <tr>
-                            @if($data['docActivity'] !== [])
-                            @php $url = "https://bepm.hanatekindo.com"; $i = 0; @endphp
-                            @foreach ($data['docActivity'][0]['files'] as $doc)
-                                <td style="text-align: center;">
-                                    <a onclick="openModernModal('{{ $url . $doc }}')" style="text-decoration: none; color: grey; font-size: 40px; cursor: pointer">
-                                        <i class="fa-solid fa-file-image"></i>
-                                    </a>
-                                </td>
-                            @endforeach
-                            @endif
-                        </tr>
-                        <tr>
-                            @if($data['docActivity'] !== [])
-                            @foreach ($data['docActivity'][0]['files'] as $doc)
-                                <td style="text-align: center;">Dokumentasi {{ $i+1 }}</td>
-                                @php $i++; @endphp
-                            @endforeach
-                            @endif
-                        </tr>
-                    </table>
-                </div>
-                {{-- @endif --}}
-            </div>
-        </div>
-        <div class="card-footer">
-            <button type="button" class="btn btn-danger" id="btnDelete">
-                <i class="fa-solid fa-trash"></i> Delete
-            </button>
-        </div>
+        </section>
     </div>
-</section>
+</div>
+
 
 <div id="modernImageModal" class="modern-modal" style="display: none" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modern-modal-content">
