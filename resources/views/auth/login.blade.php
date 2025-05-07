@@ -26,7 +26,7 @@
                         <div class="col-md-8 col-8">
                         </div>
                     </div>
-                    <p class="auth-subtitle mb-5">Aplikasi Internal Manajemen Proyek</p>
+                    <p class="auth-subtitle mb-5">Aplikasi Manajemen Proyek Internal</p>
                     <form action="{{ route('login.process') }}" method="POST">
                         @csrf
                         <div class="form-group position-relative has-icon-left mb-4">
