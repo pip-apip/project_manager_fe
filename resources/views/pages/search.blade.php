@@ -175,7 +175,7 @@
                         <p class="card-text">${shortDescription}</p>
                         <div class="d-flex justify-content-between">
                             <small class="d-md-none mt-2">${dateFormat(doc.created_at) || 'Unknown Date'}</small>
-                            <button type="submit" class="btn btn-primary me-1 justify-content-end" onclick="readModal(${doc.id})">Read More...</button>
+                            <button type="submit" class="btn btn-primary me-1 justify-content-end" onclick="readModal(${doc.id})">Selengkap nya</button>
                         </div>
                     </div>
                 </div>`;
