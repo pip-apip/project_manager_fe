@@ -1,0 +1,60 @@
+body {
+    background-color: #fff
+}
+
+#auth {
+    height: 100vh;
+    overflow-x: hidden
+}
+
+#auth #auth-right {
+    height: 100%;
+    background: url(../../images/bg/4853433.jpg), linear-gradient(90deg, #ffffff, #f8d5d5, #e79c9d, #c75a5d, #980003);
+}
+
+#auth #auth-left {
+    padding: 5rem 8rem
+}
+
+#auth #auth-left .auth-title {
+    font-size: 4rem;
+    margin-bottom: 1rem
+}
+
+#auth #auth-left .auth-subtitle {
+    font-size: 1.7rem;
+    line-height: 2.5rem;
+    color: #a8aebb
+}
+
+#auth #auth-left .auth-logo {
+    margin-bottom: 5rem
+}
+
+#auth #auth-left .auth-logo img {
+    height: 5rem
+}
+
+#auth .logo-title{
+    font-size: 2rem;
+    font-family: "Zain", sans-serif;
+    font-weight: 400;
+    font-style: bold;
+    color: #980003;
+}
+
+.title-right-content{
+    color: white;
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    font-family: "Zain", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+
+}
+
+@media screen and (max-width:767px) {
+    #auth #auth-left {
+        padding: 5rem
+    }
+}
