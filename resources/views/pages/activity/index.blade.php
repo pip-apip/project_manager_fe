@@ -76,8 +76,8 @@
                             @if(is_object($results) && method_exists($results, 'firstItem'))
                                 @foreach ($results as $act)
                                 <tr>
-                                    <td class="text-center">{{ \Carbon\Carbon::parse($act['start_date'])->translatedFormat('d F Y') }}</td>
-                                    <td class="text-center">{{ \Carbon\Carbon::parse($act['end_date'])->translatedFormat('d F Y') }}</td>
+                                    <td class="text-center">{{ \Carbon\Carbon::parse($act['start_date'])->translatedFormat('d-m-Y') }}</td>
+                                    <td class="text-center">{{ \Carbon\Carbon::parse($act['end_date'])->translatedFormat('d-m-Y') }}</td>
                                     <td>{{ $act['project_name'] }}</td>
                                     <td>{{ $act['title'] }}</td>
                                     <td class="text-center">
