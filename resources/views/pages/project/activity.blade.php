@@ -4,7 +4,6 @@
 
 @section('content')
 
-
 <div class="page-heading">
     <div class="page-content">
         <section id="basic-horizontal-layouts">
@@ -40,13 +39,13 @@
                                 <label>Kontrak Mulai</label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" class="form-control" value="{{ \Carbon\Carbon::parse($project['start_date'])->translatedFormat('d F Y') }}" readonly />
+                                <input type="text" class="form-control" value="{{ \Carbon\Carbon::parse($project['start_date'])->translatedFormat('d-m-Y') }}" readonly />
                             </div>
                             <div class="col-md-2">
                                 <label>Kontrak Selesai</label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" class="form-control" value="{{ \Carbon\Carbon::parse($project['end_date'])->translatedFormat('d F Y') }}" readonly />
+                                <input type="text" class="form-control" value="{{ \Carbon\Carbon::parse($project['end_date'])->translatedFormat('d-m-Y') }}" readonly />
                             </div>
                         </div>
                     </form>
@@ -79,9 +78,9 @@
                                 <table class="table table-striped" id="table1">
                                     <thead>
                                         <tr>
-                                            <th width="13%" class="text-center">Mulai</th>
-                                            <th width="13%" class="text-center">Selesai</th>
-                                            <th>Judul Aktivitas</th>
+                                            <th width="12%" class="text-center">Mulai</th>
+                                            <th width="12%" class="text-center">Selesai</th>
+                                            <th>Catatan Aktivitas</th>
                                             <th width="10%" class="text-center">Status</th>
                                             <th width="18%" class="text-center">Aksi</th>
                                         </tr>
@@ -90,8 +89,8 @@
                                     @if ($activities !== [])
                                         @foreach ($activities as $act)
                                         <tr>
-                                            <td class="text-center">{{ \Carbon\Carbon::parse($act['start_date'])->translatedFormat('d F Y') }}</td>
-                                            <td class="text-center">{{ \Carbon\Carbon::parse($act['end_date'])->translatedFormat('d F Y') }}</td>
+                                            <td class="text-center">{{ \Carbon\Carbon::parse($act['start_date'])->translatedFormat('d-m-Y') }}</td>
+                                            <td class="text-center">{{ \Carbon\Carbon::parse($act['end_date'])->translatedFormat('d-m-Y') }}</td>
                                             <td>{{ $act['title'] }}</td>
                                             <td class="text-center">
                                                 {{-- <span class="badge {{ $project['status'] ? 'bg-success' : 'bg-danger'}}"> --}}

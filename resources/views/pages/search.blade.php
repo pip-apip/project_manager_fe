@@ -155,10 +155,14 @@
             return;
         }
 
-        let content_doc = '';
+        let content_doc = ''; let content_tag = '';
         $.each(filteredDocs, function (index, doc) {
-            let shortDescription = doc.description.length > 280
-                ? doc.description.substring(0, 280) + " ...."
+            $.each(doc.tags, function (indexs, tag) {
+                content_tag += `<span class="badge bg-light-secondary" style="margin:5px;">${tag}</span>`;
+            });
+
+            let shortDescription = doc.description.length > 350
+                ? doc.description.substring(0, 350) + " ...."
                 : doc.description;
                 console.log(doc)
             content_doc += `
@@ -172,10 +176,15 @@
                                 <small>${dateFormat(doc.created_at) || 'Unknown Date'}</small>
                             </div>
                         </div>
-                        <p class="card-text">${shortDescription}</p>
+                        <p class="card-text" style="text-align: justify;text-justify: inter-word;">${shortDescription}</p>
                         <div class="d-flex justify-content-between">
                             <small class="d-md-none mt-2">${dateFormat(doc.created_at) || 'Unknown Date'}</small>
-                            <button type="submit" class="btn btn-primary me-1 justify-content-end" onclick="readModal(${doc.id})">Selengkap nya</button>
+                            <button type="submit" class="btn btn-primary me-1 justify-content-end" onclick="readModal(${doc.id})">Selengkapnya</button>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding-top:1px;">
+                        <div class="badges">
+                            ${content_tag}
                         </div>
                     </div>
                 </div>`;
@@ -188,7 +197,7 @@
         let doc = dataDoc.find(doc => doc.id === id);
         console.log("readModal",doc);
         let modal = $('#readModal');
-        modal.find('#activity_name').text(doc.activity_name);
+        modal.find('#activity_name').text(doc.activity.title);
         modal.find('#doc_title').text(doc.title);
         modal.find('#description').text(doc.description);
         let tagsShow = doc.tags.map(tag =>

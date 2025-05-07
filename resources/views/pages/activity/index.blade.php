@@ -66,10 +66,10 @@
                                 <tr>
                                     <th width="12%" class="text-center">Mulai</th>
                                     <th width="12%" class="text-center">Selesai</th>
-                                    <th width="20%" class="text-center">Proyek</th>
-                                    <th class="text-center">Judul Aktivitas</th>
+                                    <th width="20%">Proyek</th>
+                                    <th>Judul Aktivitas</th>
                                     <th width="10%" class="text-center">Status</th>
-                                    <th width="15%" class="text-center">Aksi</th>
+                                    <th width="10%" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="table_body">
@@ -88,14 +88,14 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('activity.edit', $act['id']) }}" class="btn btn-sm btn-warning rounded-pill">
+                                        <!-- <a href="{{ route('activity.edit', $act['id']) }}" class="btn btn-sm btn-warning rounded-pill">
                                             <i class="fa-solid fa-pen"></i>
+                                        </a> -->
+                                        <a href="{{ route('activity.doc', $act['id']) }}" class="btn btn-sm btn-info rounded-pill">
+                                            <i class="fa-solid fa-file"></i>
                                         </a>
                                         <a href="javascript:void(0)" class="btn btn-sm btn-danger rounded-pill" onclick="confirmDelete('{{ route('activity.destroy', $act['id']) }}')">
                                             <i class="fa-solid fa-trash"></i>
-                                        </a>
-                                        <a href="{{ route('activity.doc', $act['id']) }}" class="btn btn-sm btn-info rounded-pill">
-                                            <i class="fa-solid fa-file"></i>
                                         </a>
                                     </td>
                                 </tr>

@@ -105,8 +105,8 @@
                         <table class="table table-striped" id="table">
                             <thead>
                                 <tr>
-                                    <th width="13%" class="text-center">Mulai</th>
-                                    <th width="13%" class="text-center">Selesai</th>
+                                    <th width="12%" class="text-center">Mulai</th>
+                                    <th width="12%" class="text-center">Selesai</th>
                                     <th>Nama Proyek</th>
                                     <th width="20%">Nama Perusahaan</th>
                                     <th width="10%" class="text-center">Status</th>
@@ -120,8 +120,8 @@
                             @if(is_object($results) && method_exists($results, 'firstItem'))
                                 @foreach ($results as $project)
                                     <tr>
-                                        <td class="text-center">{{ \Carbon\Carbon::parse($project['start_date'])->translatedFormat('d F Y') }}</td>
-                                        <td class="text-center">{{ \Carbon\Carbon::parse($project['end_date'])->translatedFormat('d F Y') }}</td>
+                                        <td class="text-center">{{ \Carbon\Carbon::parse($project['start_date'])->translatedFormat('d-m-Y') }}</td>
+                                        <td class="text-center">{{ \Carbon\Carbon::parse($project['end_date'])->translatedFormat('d-m-Y') }}</td>
                                         <td>{{ $project['name'] }}</td>
                                         <td>{{ $project['company_name'] }}</td>
                                         <td class="text-center">
@@ -183,68 +183,52 @@
             </div>
             <div>
                 <div class="modal-body">
-
-
                     <div class="row">
-
                         <div class="col-sm-8">
                             <label><b> Nama Proyek : </b></label>
                             <div class="form-group">
-                                <p class="form-control-static" id="project_name_detail">Alpha Build</p>
+                                <p class="form-control-static" id="project_name_detail"></p>
                             </div>
-
                             <label><b> Nama Perusahaan : </b></label>
                             <div class="form-group">
-                                <p class="form-control-static" id="company_name_detail">Alpha Build</p>
+                                <p class="form-control-static" id="company_name_detail"></p>
                             </div>
-
                             <label><b> Alamat Perusahaan : </b></label>
                             <div class="form-group">
                                 <div class="form-floating">
-                                    <p class="form-control-static" id="company_address_detail">Lorem ipsum dolor sit amet
-                                        consectetur adipisicing elit. Velit maxime aut ipsam explicabo, cum consequuntur
-                                        numquam dolorem harum asperiores omnis? Repellendus quasi harum consequuntur
-                                        eveniet saepe voluptates quos placeat odit.</p>
+                                    <p class="form-control-static" id="company_address_detail"></p>
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-sm-4">
                             <label><b> Nama Pimpinan Proyek : </b></label>
                             <div class="form-group">
-                                <p class="form-control-static" id="project_leader_detail">John Doe</p>
+                                <p class="form-control-static" id="project_leader_detail"></p>
                             </div>
-
                             <label><b> Nama Direktur : </b></label>
                             <div class="form-group">
-                                <p class="form-control-static" id="director_name_detail">John Doe</p>
+                                <p class="form-control-static" id="director_name_detail"></p>
                             </div>
-
                             <label><b> No.Telp Direktur : </b></label>
                             <div class="form-group">
-                                <p class="form-control-static" id="director_phone_detail">089213182731</p>
+                                <p class="form-control-static" id="director_phone_detail"></p>
                             </div>
                         </div>
-
                         <hr>
-
                         <div class="col-sm-8">
-                            <label><b> Tanggal Mulai : </b></label>
+                            <label><b> Kontrak Mulai : </b></label>
                             <div class="form-group">
-                                <p class="form-control-static" id="start_project_detail">10-01-2023</p>
+                                <p class="form-control-static" id="start_project_detail"></p>
                             </div>
                         </div>
-
                         <div class="col-sm-4">
-                            <label><b> Tanggal Selesai : </b></label>
+                            <label><b> Kontrak Selesai : </b></label>
                             <div class="form-group">
-                                <p class="form-control-static" id="end_project_detail">10-05-2023</p>
+                                <p class="form-control-static" id="end_project_detail"></p>
                             </div>
                         </div>
                     </div>
-
                 </div>
-
                 <div class="modal-footer">
                     <a class="btn btn-warning ml-1" id="editButton">
                         <i class="fa-solid fa-pen"></i> Edit
@@ -274,20 +258,20 @@
                         <div class="col-sm-6">
                             <label><b> Nama Proyek : </b></label>
                             <div class="form-group">
-                                <p class="form-control-static" id="project_name_team">Alpha Build</p>
+                                <p class="form-control-static" id="project_name_team"></p>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <label><b> Pimpinan Proyek : </b></label>
                             <div class="form-group">
-                                <p class="form-control-static" id="project_leader_team">Alpha Build</p>
+                                <p class="form-control-static" id="project_leader_team"></p>
                             </div>
                         </div>
                     </div>
                     <hr>
                     <div class="row" id="teamInput" style="display: none">
                         <div class="col-sm-6">
-                            <p class="text-center"><b>ALL USER</b></p>
+                            <p class="text-center"><b>Semua</b></p>
                             <hr>
                             <table class="table table-striped mb-0 scrollable-table">
                                 <thead>
@@ -302,7 +286,7 @@
                         </div>
                         <hr class="d-sm-none">
                         <div class="col-sm-6">
-                            <p class="text-center"><b>FIX TEAM</b></p>
+                            <p class="text-center"><b>Anggota</b></p>
                             <hr>
                             <table class="table table-striped mb-0 scrollable-table">
                                 <thead>
@@ -318,8 +302,9 @@
                     </div>
                     <div id="teamShow" style="display: none">
                         <div class="row">
-                            <div class="col-sm-2"></div>
-                            <div class="col-sm-8">
+                            <p class="text-center"><b>Anggota</b></p>
+                            <hr>
+                            <div class="col-sm-12">
                                 <table class="table table-striped mb-0 scrollable-table">
                                     <thead>
                                         <tr>
@@ -660,7 +645,7 @@
 
     function showDetail(data){
         console.log(data);
-        let onclickDelete = `confirmDelete("` + `{{ route('project.destroy', '') }}` + `/${data.id}")`;
+        let onclickDelete = `confirmDelete("` + `{{ url('project/destroy/${data.id}') }}`;
         $("#project_leader_detail").text(data.project_leader_name);
         $("#project_name_detail").text(data.name);
         $("#company_name_detail").text(data.company_name);
