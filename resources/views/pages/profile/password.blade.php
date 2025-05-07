@@ -16,7 +16,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                   <form action="{{ route('profile.change', $user['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data">
+                    <form action="{{ route('profile.change', $user['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data">
                     @csrf
                         <div class="row">
                             <div class="col-md-2">
@@ -51,7 +51,7 @@
                             </div>
                             <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
                                 <button type="submit"
-                                    class="btn btn-primary me-1 mb-1">Simpan</button>
+                                    class="btn btn-primary me-1 mb-1" id="submitButton">Simpan</button>
                                 <button type="reset"
                                     class="btn btn-light-secondary me-1 mb-1">Batal</button>
                             </div>
@@ -108,5 +108,14 @@
         });
     </script>
 @endif
+
+<script>
+    $(document).ready(function() {
+        $('form').on('submit', function() {
+            // $('#fullPageLoader').show();
+            buttonLoadingStart('submitButton');
+        });
+    });
+</script>
 
 @endsection
