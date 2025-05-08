@@ -121,7 +121,7 @@ class CategoryActController extends Controller
             'project_id' => $request->input('project_id'),
         ]);
 
-        if ($response->json()['status'] !== 200) {
+        if ($response->json()['status'] !== 200 && $response->json()['status'] !== 201) {
             $errors = $response->json()['errors'];
 
             return redirect()->back()->withInput()->withErrors($errors);
