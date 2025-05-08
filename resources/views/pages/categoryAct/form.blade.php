@@ -11,7 +11,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-sm-8 col-8">
-                            <h1>{{ $status === 'create' ? 'Tambah' : 'Edit' }} <span class="d-none d-md-inline-block">Kategori Aktivitas</span></h1>
+                            <h1>{{ $status === 'create' ? 'Tambah' : 'Ubah' }} <span class="d-none d-md-inline-block">Kategori Aktivitas</span></h1>
                         </div>
                         <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
                             <a href="{{ route('categoryAct.index') }}" class="btn btn-secondary btn-sm">
@@ -47,7 +47,7 @@
                                 <label>Nama Kategori <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" placeholder="Masukkan Nama Kategori" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', $category ? $category['name'] : '') }}">
+                                <input type="text" placeholder="Masukkan Nama Kategori" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', $category ? $category['name'] : '') }}" autocomplete="off" />
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

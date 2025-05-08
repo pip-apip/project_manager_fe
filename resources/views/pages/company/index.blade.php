@@ -141,20 +141,13 @@
                         <table class="table table-striped" id="table">
                             <thead>
                                 <tr>
-                                {{-- <th width="100">No</th> --}}
-                                    <th width="20%" class="text-center">Nama Perusahaan</th>
-                                    <th class="text-center">Alamat Perusahaan</th>
-                                    <th width="15%" class="text-center">Nama Direktur</th>
-                                    {{-- <th>Director Phone</th> --}}
-                                    {{-- <th>Director Signature</th> --}}
+                                    <th width="20%">Nama Perusahaan</th>
+                                    <th>Alamat Perusahaan</th>
+                                    <th width="15%">Nama Direktur</th>
                                     <th width="10%" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="table-body">
-
-                            {{-- @php
-                                    $no = is_object($results) && method_exists($results, 'firstItem') ? $results->firstItem() : 0;
-                                @endphp --}}
                             @if(is_object($results) && method_exists($results, 'firstItem'))
                                 @foreach ($results as $company)
                                 @php
@@ -162,7 +155,6 @@
                                     '<button class="btn btn-sm btn-info" onclick="openModernModal(\'' . $API_url . $company['director_signature'] . '\')"><i class="fa-solid fa-eye"></i> Preview Signature</button>' : "Don't have Signature Director";
                                 @endphp
                                 <tr>
-                                {{-- <td>{{ $no++ }}</td> --}}
                                     <td>{{ $company['name'] }}</td>
                                     <td>{{ $company['address'] }}</td>
                                     <td>{{ $company['director_name'] }}</td>

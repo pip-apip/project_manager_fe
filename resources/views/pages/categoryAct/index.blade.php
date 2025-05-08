@@ -79,8 +79,8 @@
                         @if(is_object($results) && method_exists($results, 'firstItem'))
                             @foreach ($results as $category)
                                 <tr>
-                                    <td>{{ $category['name'] }}</td>
                                     <td>{{ $category['project_name'] ? $category['project_name'] : 'Lain - lain' }}</td>
+                                    <td>{{ $category['name'] }}</td>
                                     <td class="text-center">
                                         <a href="{{ route('categoryAct.edit', $category['id']) }}" class="btn btn-sm btn-warning rounded-pill">
                                             <i class="fa-solid fa-pen"></i>

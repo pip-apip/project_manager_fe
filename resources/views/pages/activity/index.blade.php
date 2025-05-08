@@ -64,8 +64,7 @@
                         <table class="table table-striped" id="table">
                             <thead>
                                 <tr>
-                                    <th width="12%" class="text-center">Mulai</th>
-                                    <th width="12%" class="text-center">Selesai</th>
+                                    <th width="12%" class="text-center">Tanggal</th>
                                     <th width="20%">Proyek</th>
                                     <th>Judul Aktivitas</th>
                                     <th width="10%" class="text-center">Status</th>
@@ -77,7 +76,6 @@
                                 @foreach ($results as $act)
                                 <tr>
                                     <td class="text-center">{{ \Carbon\Carbon::parse($act['start_date'])->translatedFormat('d-m-Y') }}</td>
-                                    <td class="text-center">{{ \Carbon\Carbon::parse($act['end_date'])->translatedFormat('d-m-Y') }}</td>
                                     <td>{{ $act['project_name'] }}</td>
                                     <td>{{ $act['title'] }}</td>
                                     <td class="text-center">
@@ -102,14 +100,14 @@
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="6" class="text-center">Tidak ada data</td>
+                                    <td colspan="5" class="text-center">Tidak ada data</td>
                                 </tr>
                             @endif
                             </tbody>
                             <tfoot>
                                 <tr>
                                     @if (is_object($results) && method_exists($results, 'onEachSide'))
-                                        <td colspan="6"><span style="margin-top: 15px;">{{ $results->appends(request()->query())->links() }}</span></td>
+                                        <td colspan="5"><span style="margin-top: 15px;">{{ $results->appends(request()->query())->links() }}</span></td>
                                     @endif
                                 </tr>
                             </tfoot>

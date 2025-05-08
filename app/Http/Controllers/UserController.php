@@ -122,7 +122,7 @@ class UserController extends Controller
 
         $user = $response->json()['data'][0];
 
-        return view('pages.user.form', compact('user'))->with(['title' => 'user', 'status' => 'edit']);
+        return view('pages.user.edit', compact('user'))->with(['title' => 'user', 'status' => 'edit']);
     }
 
     /**

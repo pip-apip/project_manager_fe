@@ -305,7 +305,7 @@
                                         <label>Judul Dokumen <code>*</code></label>
                                     </div>
                                     <div class="form-group col-md-10">
-                                        <input type="text" placeholder="Masukkan Judul Dokumen Kegiatan" class="form-control" name="title" id="title_activity_doc">
+                                        <input type="text" placeholder="Masukkan Judul Dokumen Kegiatan" class="form-control" name="title" id="title_activity_doc" autocomplete="off" />
                                     </div>
 
                                     <div class="col-md-2">
