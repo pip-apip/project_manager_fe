@@ -87,7 +87,7 @@
                                             Profil</a></li>
                                     <li><a class="dropdown-item" href="{{ route('profile.password') }}"><i class="icon-mid bi bi-lock me-2"></i>
                                             Kata Sandi</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="icon-mid bi bi-wallet me-2"></i>
+                                    <li><a class="dropdown-item" href="{{ route('activity.index') }}"><i class="icon-mid bi bi-wallet me-2"></i>
                                             Aktivitas</a></li>
                                     <li>
                                         <hr class="dropdown-divider">

@@ -54,47 +54,41 @@
                         <table class="table table-striped" id="table">
                             <thead>
                                 <tr>
-                                    {{-- <th width="100">No</th> --}}
-                                    <th width="20%" class="text-center">Username</th>
-                                    <th class="text-center">Nama</th>
+                                    <th width="20%">Username</th>
+                                    <th>Nama</th>
                                     <th width="15%" class="text-center">Hak Akses</th>
                                     <th width="10%" class="text-center">Status</th>
                                     <th width="10%" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
-
-                        {{-- @php
-                                $no = is_object($results) && method_exists($results, 'firstItem') ? $results->firstItem() : 0;
-                            @endphp --}}
-                        <tbody id="table_body">
-                        @if(is_object($results) && method_exists($results, 'firstItem'))
-                            @foreach ($results as $user)
-                                @php
-                                    $status = '<span class="badge ' . (isset($user['token']) && $user['token'] ? 'bg-success' : 'bg-danger') . '">'
-                                            . (isset($user['token']) && $user['token'] ? 'Online' : 'Offline') . '</span>';
-                                @endphp
-                                <tr>
-                                    {{-- <td>{{ $no++ }}</td> --}}
-                                    <td>{{ $user['username'] }}</td>
-                                    <td>{{ $user['name'] }}</td>
-                                    <td class="text-center">{{ $user['role'] }}</td>
-                                    <td class="text-center">{!! $status !!}</td>
-
-                                    <td class="text-center">
-                                        <a href="{{ route('user.edit', $user['id']) }}" class="btn btn-sm btn-warning rounded-pill">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </a>
-                                        <a href="javascript:void(0)" class="btn btn-sm btn-danger rounded-pill" onclick="confirmDelete('{{ route('user.destroy', $user['id']) }}')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            @else
+                            <tbody id="table_body">
+                            @if(is_object($results) && method_exists($results, 'firstItem'))
+                                @foreach ($results as $user)
+                                    @php
+                                        $status = '<span class="badge ' . (isset($user['token']) && $user['token'] ? 'bg-success' : 'bg-danger') . '">'
+                                                . (isset($user['token']) && $user['token'] ? 'Online' : 'Offline') . '</span>';
+                                    @endphp
                                     <tr>
-                                        <td colspan="5" class="text-center">Tidak ada data</td>
+                                        <td>{{ $user['username'] }}</td>
+                                        <td>{{ $user['name'] }}</td>
+                                        <td class="text-center">{{ $user['role'] }}</td>
+                                        <td class="text-center">{!! $status !!}</td>
+
+                                        <td class="text-center">
+                                            <a href="{{ route('user.edit', $user['id']) }}" class="btn btn-sm btn-warning rounded-pill">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn btn-sm btn-danger rounded-pill" onclick="confirmDelete('{{ route('user.destroy', $user['id']) }}')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </a>
+                                        </td>
                                     </tr>
-                            @endif
+                                    @endforeach
+                                @else
+                                        <tr>
+                                            <td colspan="5" class="text-center">Tidak ada data</td>
+                                        </tr>
+                                @endif
                                 </tbody>
                                 <tfoot>
                                     <tr>
