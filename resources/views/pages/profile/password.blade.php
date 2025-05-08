@@ -35,7 +35,7 @@
                                 <label>Password Lama <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="password" placeholder="Masukkan Password Lama" class="form-control @error('password') is-invalid @enderror" id="password" name="password">
+                                <input type="password" placeholder="Masukkan Password Lama" class="form-control @error('password') is-invalid @enderror" id="password" name="password" autocomplete="off" />
                                 @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -44,7 +44,7 @@
                                 <label>Password Baru <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="password" placeholder="Masukkan Password Baru" class="form-control @error('password_new') is-invalid @enderror" id="password_new" name="password_new">
+                                <input type="password" placeholder="Masukkan Password Baru" class="form-control @error('password_new') is-invalid @enderror" id="password_new" name="password_new" autocomplete="off" />
                                 @error('password_new')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

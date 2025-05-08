@@ -231,7 +231,7 @@
                                 <label>Catatan <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" placeholder="Masukkan Catatan Dokumen Administrasi" class="form-control @error('title') is-invalid @enderror" name="title" id="title">
+                                <input type="text" placeholder="Masukkan Catatan Dokumen Administrasi" class="form-control @error('title') is-invalid @enderror" name="title" id="title" autocomplete="off" />
                                     @error('title')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

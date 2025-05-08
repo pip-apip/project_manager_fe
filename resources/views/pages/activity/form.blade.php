@@ -58,7 +58,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-sm-8 col-8">
-                            <h1>{{ $status === 'create' ? 'Tambah' : 'Edit' }} <span class="d-none d-md-inline-block">Aktivitas</span></h1>
+                            <h1>{{ $status === 'create' ? 'Tambah' : 'Ubah' }} <span class="d-none d-md-inline-block">Aktivitas</span></h1>
                         </div>
                         <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
                             <a href="{{ isset($lastRoute[0], $lastRoute[1]) ? route($lastRoute[0], $lastRoute[1]) : route('activity.index') }}" class="btn btn-secondary btn-sm">
@@ -80,7 +80,7 @@
                             </div>
                             <fieldset class="form-group col-md-10">
                                 @if ($countDocAct > 0)
-                                    <input type="text" name="project_id" id="project_id" value="{{ $activity['project_id'] }}" hidden>
+                                    <input type="text" name="project_id" id="project_id" value="{{ $activity['project_id'] }}" hidden />
                                 @endif
                                 <select class="form-select @error('project_id') is-invalid @enderror" id="project_id" name="project_id" {{ $countDocAct > 0 ? 'disabled' : '' }}>
                                     <option value="">Pilih Proyek</option>
@@ -95,7 +95,7 @@
                                 @enderror
                             </fieldset>
                             {{-- @if ($countDocAct > 0)
-                                <input type="text" name="project_id" id="project_id" value="{{ $activity['project']['id'] }}" hidden>
+                                <input type="text" name="project_id" id="project_id" value="{{ $activity['project']['id'] }}" hidden />
                             @endif --}}
                             <div class="col-md-2">
                                 <label>Kategori Aktivitas <code>*</code></label>
@@ -114,7 +114,7 @@
                                 <label>Catatan Aktivitas <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" placeholder="Masukkan Catatan Aktivitas" class="form-control @error('title') is-invalid @enderror" name="title" id="title" value="{{ old('title', $activity ? $activity['title'] : '') }}">
+                                <input type="text" placeholder="Masukkan Catatan Aktivitas" class="form-control @error('title') is-invalid @enderror" name="title" id="title" value="{{ old('title', $activity ? $activity['title'] : '') }}"  autocomplete="off" />
                                 @error('title')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -123,7 +123,7 @@
                                 <label>Tanggal Mulai <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="date" class="form-control @error('start_date') is-invalid @enderror" name="start_date" id="start_date" value="{{ old('start_date', $activity ? $activity['start_date'] : '') }}">
+                                <input type="date" class="form-control @error('start_date') is-invalid @enderror" name="start_date" id="start_date" value="{{ old('start_date', $activity ? $activity['start_date'] : '') }}" autocomplete="off" />
                                 @error('start_date')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -141,7 +141,7 @@
                                 <label>Tanggal Selesai <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="date" class="form-control @error('end_date') is-invalid @enderror" name="end_date" id="end_date" value="{{ old('end_date', $activity ? $activity['end_date'] : '') }}">
+                                <input type="date" class="form-control @error('end_date') is-invalid @enderror" name="end_date" id="end_date" value="{{ old('end_date', $activity ? $activity['end_date'] : '') }}" autocomplete="off" />
                                 @error('end_date')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -178,7 +178,7 @@
                             <table class="table table-striped mb-0 scrollable-table">
                                 <thead>
                                     <tr>
-                                        <th width="80%">Nama <input type="text" id="userSearch"></th>
+                                        <th width="80%">Nama <input type="text" id="userSearch" autocomplete="off" /></th>
                                         <th width="20%" style="text-align: center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -193,7 +193,7 @@
                             <table class="table table-striped mb-0 scrollable-table">
                                 <thead>
                                     <tr>
-                                        <th width="80%">Nama <input type="text" id="teamSearch"></th>
+                                        <th width="80%">Nama <input type="text" id="teamSearch" autocomplete="off" /></th>
                                         <th width="20%">Aksi</th>
                                     </tr>
                                 </thead>

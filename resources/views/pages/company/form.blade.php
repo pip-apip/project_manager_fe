@@ -76,7 +76,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-sm-8 col-8">
-                            <h1>{{ $status === 'create' ? 'Tambah' : 'Edit' }} <span class="d-none d-md-inline-block">Perusahaan</span></h1>
+                            <h1>{{ $status === 'create' ? 'Tambah' : 'Ubah' }} <span class="d-none d-md-inline-block">Perusahaan</span></h1>
                         </div>
                         <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
                             <a href="{{ route('company.index') }}" class="btn btn-secondary btn-sm">
@@ -97,7 +97,7 @@
                                 <label>Nama Perusahaan <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" placeholder="Masukkan Nama Perusahaan" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $company ? $company['name'] : '') }}">
+                                <input type="text" placeholder="Masukkan Nama Perusahaan" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $company ? $company['name'] : '') }}" autocomplete="off" />
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -116,7 +116,7 @@
                                 <label>Nama Direktur <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" placeholder="Masukkan Nama Direktur" class="form-control @error('director_name') is-invalid @enderror" name="director_name" id="director_name" value="{{ old('director_name', $company ? $company['director_name'] : '') }}">
+                                <input type="text" placeholder="Masukkan Nama Direktur" class="form-control @error('director_name') is-invalid @enderror" name="director_name" id="director_name" value="{{ old('director_name', $company ? $company['director_name'] : '') }}" autocomplete="off" />
                                 @error('director_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -125,12 +125,11 @@
                                 <label>No.Telp Direktur <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" placeholder="Masukkan No.Telp Direktur" class="form-control @error('director_phone') is-invalid @enderror" name="director_phone" id="director_phone" value="{{ old('director_phone', $company ? $company['director_phone'] : '') }}">
+                                <input type="text" placeholder="Masukkan No.Telp Direktur" class="form-control @error('director_phone') is-invalid @enderror" name="director_phone" id="director_phone" value="{{ old('director_phone', $company ? $company['director_phone'] : '') }}" autocomplete="off" />
                                 @error('director_phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
                             <div class="col-md-2">
                                 <label>Tanda Tangan Direktur</label>
                             </div>
