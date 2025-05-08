@@ -130,7 +130,7 @@ class CompanyController extends Controller
             ->post('https://bepm.hanatekindo.com/api/v1/companies', $data);
         }
 
-        if ($response->json()['status'] == 400) {
+        if ($response->json()['status'] !== 201) {
             $errors = $response->json()['errors'];
 
             // Return the errors to the view, keeping old input data
