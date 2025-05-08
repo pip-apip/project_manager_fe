@@ -14,7 +14,7 @@
     .scrollable-table tbody tr {
         display: table;
         width: 100%;
-        table-layout: fixed; /* Prevents layout issues */
+        table-layout: fixed;
     }
 
     .scrollable-table tbody {
@@ -37,7 +37,28 @@
     .scrollable-table thead th input[type="text"]:focus {
         outline: none;
         box-shadow: none;
-        border-color: #ccc; /* atau warna border default yang kamu mau */
+        border-color: #ccc;
+    }
+
+    /* Override tampilan select2 agar mirip select bawaan template */
+    .select2-container--default .select2-selection--single {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        height: calc(2.5rem + 2px);
+        padding: .375rem 1.75rem .375rem .75rem;
+        font-size: 1rem;
+        color: #495057;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 1.8rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 2.0rem;
+        top: 0.25rem;
+        right: 0.5rem;
     }
 
     .modal-body {
@@ -97,17 +118,17 @@
                             {{-- @if ($countDocAct > 0)
                                 <input type="text" name="project_id" id="project_id" value="{{ $activity['project']['id'] }}" hidden>
                             @endif --}}
+                            @php
+                                $grouped = collect($categoryAct)->groupBy(function($item) {
+                                    return $item['activity_category_project_id'] ?? 'Tanpa Proyek';
+                                });
+                            @endphp
                             <div class="col-md-2">
                                 <label>Kategori Aktivitas <code>*</code></label>
                             </div>
                             <fieldset class="form-group col-md-10">
                                 <select class="form-select" id="activity_category_id" name="activity_category_id">
-                                    <option value="#">Pilih Kategori</option>
-                                    @foreach ($categoryAct as $cat)
-                                    <option value="{{ $cat['id'] }}" {{ old('activity_category_id', $activity ? $activity['activity_category_id'] : '') == $cat['id'] ? 'selected' : '' }}>
-                                        {{ $cat['name'] }}
-                                    </option>
-                                    @endforeach
+
                                 </select>
                             </fieldset>
                             <div class="col-md-2">
@@ -242,6 +263,7 @@
 
 <script src="{{ asset('assets/vendors/simple-datatables/simple-datatables.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 @if(session()->has('success'))
     <script>
@@ -265,12 +287,18 @@
 
 <script>
     $(document).ready(function() {
+        console.log({!! json_encode($projects) !!})
         $('form').on('submit', function() {
             // $('#fullPageLoader').show();
             buttonLoadingStart('submitButton');
         });
+
+        $('#activity_category_id').select2({
+            placeholder: "Pilih Kategori",
+            width: '100%'
+        });
     });
-    
+
     let access_token = @json(session('user.access_token'));
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -283,7 +311,6 @@
             $('#activity_category_id').prop('disabled', true);
         } else {
             showCategoryList(projectSelected);
-            $('#activity_category_id').prop('disabled', false);
         }
         setUser();
     });
@@ -294,13 +321,12 @@
             $('#activity_category_id').prop('disabled', true);
         } else {
             showCategoryList(projectSelected);
-            $('#activity_category_id').prop('disabled', false);
         }
     });
 
     function showCategoryList(project_id) {
         $.ajax({
-            url: `https://bepm.hanatekindo.com/api/v1/activity-categories/search?project_id=${project_id}, 0`,
+            url: `https://bepm.hanatekindo.com/api/v1/activity-categories/search?project_id=${project_id},0`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': 'Bearer ' + access_token,
@@ -310,15 +336,37 @@
             //     project_id: project_id
             // },
             success: function(response) {
+                $('#activity_category_id').prop('disabled', false);
                 console.log(response);
-                $('#activity_category_id').empty();
-                $('#activity_category_id').append('<option value="">Pilih Kategori</option>');
-                $.each(response.data, function(index, category) {
-                    $('#activity_category_id').append('<option value="' + category.id + '">' + category.name + '</option>');
+                const $select = $('#activity_category_id');
+                $select.empty();
+                $select.append('<option value="">Pilih Kategori</option>');
+
+                // Grouping
+                const grouped = {};
+
+                response.data.forEach(function(category) {
+                    let group = category.project_id ?? 'Tanpa Proyek';
+                    if (!grouped[group]) grouped[group] = [];
+                    grouped[group].push(category);
+                });
+                console.log(grouped);
+
+                const sortedGroups = Object.keys(grouped).sort((a, b) => {
+                    return (isNaN(b) ? b : +b) - (isNaN(a) ? a : +a);
+                });
+
+                sortedGroups.forEach(function(group) {
+                    const groupLabel = group === '0' ? 'Kategori Lain - lain' : 'Spec Tech Project';
+                    const $optgroup = $('<optgroup>').attr('label', groupLabel);
+                    grouped[group].forEach(function(cat) {
+                        $optgroup.append('<option value="' + cat.id + '">' + cat.name + '</option>');
+                    });
+                    $select.append($optgroup);
                 });
             },
             error: function(xhr, status, error) {
-                console.error(error);
+                console.error("Error:", error);
             }
         });
 
