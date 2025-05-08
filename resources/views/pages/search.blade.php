@@ -197,7 +197,7 @@
         let doc = dataDoc.find(doc => doc.id === id);
         console.log("readModal",doc);
         let modal = $('#readModal');
-        modal.find('#activity_name').text(doc.activity.title);
+        modal.find('#activity_name').text(doc.title);
         modal.find('#doc_title').text(doc.title);
         modal.find('#description').text(doc.description);
         let tagsShow = doc.tags.map(tag =>
