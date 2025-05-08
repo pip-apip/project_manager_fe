@@ -346,8 +346,8 @@
                                         @enderror
                                     </div>
                                     <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
-                                        <button type="submit"
-                                            class="btn btn-primary me-1 mb-1" id="submitButton">Simpan</button>
+                                        <button type="button"
+                                            class="btn btn-primary me-1 mb-1" id="submitButton" onclick="storeDoc()">Simpan</button>
                                         <button type="reset"
                                             class="btn btn-light-secondary me-1 mb-1">Batal</button>
                                     </div>
@@ -424,7 +424,7 @@
 {{-- Quill.js --}}
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 
-@if(session()->has('success'))
+{{-- @if(session()->has('success'))
     <script>
         Swal.fire({
             icon: 'success',
@@ -451,15 +451,9 @@
             $('#fullPageLoader').hide();
         });
     </script>
-@endif
+@endif --}}
 
 <script>
-    $(document).ready(function() {
-        $('form').on('submit', function() {
-            buttonLoadingStart('submitButton');
-        });
-    });
-
     const quill = new Quill('#quillEditor', {
         theme: 'snow',
         modules: {
@@ -582,6 +576,7 @@
     }
 
     function showDoc(data) {
+        console.log(data);
         let title = data[0]['title']
         let description = data[0]['description']
         let tags = data[0]['tags'];
@@ -606,7 +601,7 @@
     }
 
     function storeDoc() {
-        buttonLoadingStart("saveButton");
+        buttonLoadingStart("submitButton");
         let formData = new FormData(document.getElementById("form"));
         formData.append('description', quill.root.innerHTML);
         formData.append('tags', JSON.stringify(tags));
@@ -621,7 +616,7 @@
             contentType: false,
             success: function (response) {
                 console.log(response);
-                buttonLoadingEnd("saveButton");
+                buttonLoadingEnd("submitButton");
                 if(response.status === 400 || response.status === 500){
                     Swal.fire({
                         icon: 'error',
