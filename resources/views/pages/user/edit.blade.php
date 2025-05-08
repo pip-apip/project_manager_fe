@@ -5,48 +5,50 @@
 @section('content')
 
 <style>
-/* Style the tab buttons */
-.tablink {
-  background-color: #eee;
-  color: black;
-  float: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 14px 16px;
-  font-size: 17px;
-}
+    /* Style the tab buttons */
+    .tablink {
+        background-color: #fff;
+        color: black;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        font-size: 17px;
+    }
+    .tablink.active {
+        background-color: #eee;
+        color: black;
+    }
 
-.tablink:hover {
-  background-color: #ddd;
-}
+    .tablink:hover {
+        background-color: #ddd;
+    }
 
-/* Style the tab content (hidden by default) */
-.tabcontent {
-  display: none;
-  padding: 20px;
-  border: 1px solid #ccc;
-}
+    /* Style the tab content (hidden by default) */
+    .tabcontent {
+        display: none;
+        padding: 20px;
+    }
 </style>
 
 <script>
-function openTab(evt, tabName) {
-  let i, tabcontent, tablinks;
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
 
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
 
-  tablinks = document.getElementsByClassName("tablink");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
 
-  document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " active";
-}
-
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
 // Open the first tab by default
 //document.getElementsByClassName("tablink")[0].click();
 </script>
@@ -70,9 +72,10 @@ function openTab(evt, tabName) {
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-12 col-12">
-                            <button class="tablink active" onclick="openTab(event, 'Tab1')">Info. Umum</button>
+                            <button class="tablink" onclick="openTab(event, 'Tab1')">Info. Umum</button>
                             <button class="tablink" onclick="openTab(event, 'Tab2')">Kata Sandi</button>
                         </div>
+                        <hr>
                         <div class="col-sm-12 col-12">
                             <div id="Tab1" class="tabcontent" style="display:block;">
                                 <form id="formEdit" action="{{ route('user.update', $user['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data">
@@ -82,7 +85,7 @@ function openTab(evt, tabName) {
                                             <label>Username</label>
                                         </div>
                                         <div class="form-group col-md-10">
-                                            <input type="text" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $user ? $user['username'] : '') }}" readonly />
+                                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username', $user ? $user['username'] : '') }}" readonly />
                                         </div>
                                         <div class="col-md-2">
                                             <label>Nama Lengkap <code>*</code></label>
@@ -126,14 +129,32 @@ function openTab(evt, tabName) {
                                             <label>Username</label>
                                         </div>
                                         <div class="form-group col-md-10">
-                                            <input type="text" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $user ? $user['username'] : '') }}" readonly />
+                                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username', $user ? $user['username'] : '') }}" readonly />
                                         </div>
                                         <div class="col-md-2">
-                                            <label>Password <code>*</code></label>
+                                            <label>Password Lama <code>*</code></label>
                                         </div>
                                         <div class="form-group col-md-10">
-                                            <input type="password" placeholder="Masukkan Password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" autocomplete="off" />
-                                            @error('password')
+                                            <input type="password" placeholder="Masukkan Password" class="form-control @error('old_password') is-invalid @enderror" id="old_password" name="old_password" autocomplete="off" />
+                                            @error('old_password')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>Password Baru <code>*</code></label>
+                                        </div>
+                                        <div class="form-group col-md-10">
+                                            <input type="password" placeholder="Masukkan Password" class="form-control @error('new_password') is-invalid @enderror" id="new_password" name="new_password" autocomplete="off" />
+                                            @error('new_password')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>Password Konfirm <code>*</code></label>
+                                        </div>
+                                        <div class="form-group col-md-10">
+                                            <input type="password" placeholder="Masukkan Password" class="form-control @error('confirm_new_password') is-invalid @enderror" id="confirm_new_password" name="confirm_new_password" autocomplete="off" />
+                                            @error('confirm_new_password')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -210,6 +231,11 @@ function openTab(evt, tabName) {
             // $('#fullPageLoader').show();
             buttonLoadingStart('submitButtonPassword');
         });
+
+        const firstTab = document.querySelector('.tablink');
+        if (firstTab) {
+            firstTab.classList.add('active');
+        }
     });
 </script>
 

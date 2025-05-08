@@ -130,27 +130,37 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'name'      => 'required|string|max:255',
-            'username'  => 'required|string|max:255',
-            'password'  => 'required|string|min:8',
-        ]);
+        // $request->validate([
+        //     'name'      => 'required|string|max:255',
+        //     'username'  => 'required|string|max:255',
+        //     'password'  => 'required|string|min:8',
+        // ]);
 
         $accessToken = session('user.access_token');
+        $data = [];
+        if($request['name']){
+            $data['name'] = $request['name'];
+        }
+        if($request['username']){
+            $data['username'] = $request['username'];
+        }
+        if($request['old_password']){
+            $data['old_password'] = $request['old_password'];
+        }
+        if($request['new_password']){
+            $data['new_password'] = $request['new_password'];
+        }
+        if($request['confirm_new_password']){
+            $data['confirm_new_password'] = $request['confirm_new_password'];
+        }
 
-        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'.$id ,[
-            'name'      => $request['name'],
-            'username'  => $request['username'],
-            'password'  => $request['password'],
-        ]);
-
-        // dd($response->json());
-
-        if ($response->successful()) {
+        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'.$id , $data);
+        
+        if ($response->json()['status'] === 200) {
             return redirect()->route('user.index')->with('success', 'Data User edited successfully.');
         }
-        $errorMessage = $response->json('message', 'Data User failed to edited. Please try again.');
-        return redirect()->back()->withErrors(['error' => $errorMessage])->withInput();
+        // $errorMessage = $response->json('message', 'Data User failed to edited. Please try again.');
+        return redirect()->back()->with('error', $response->json()['errors']);
     }
 
     /**
