@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategoryAdmController;
 use App\Http\Controllers\CategoryActController;
@@ -126,6 +127,9 @@ Route::middleware([AuthMiddleware::class, RefershTokenMiddleware::class])->group
     Route::post('user/filter', [UserController::class, 'filter'])->name('user.filter');
     Route::get('user/reset', [UserController::class, 'reset'])->name('user.reset');
 
+    // Progress
+    Route::get('progress', [ProgressController::class, 'index'])->name('progress.index');
+    Route::get('progress/project/{id}', [ProgressController::class, 'show'])->name('progress.project');
     // Route::get('/activity-project/{id}', [ActivityController::class, 'activity_project'])->name('activity.project');
 });
 

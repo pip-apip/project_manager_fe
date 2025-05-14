@@ -10,7 +10,20 @@
     <link rel="stylesheet" href="{{ asset('assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/pages/auth.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            z-index: 10;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,7 +34,8 @@
                 <div id="auth-left">
                     <div class="row mb-0">
                         <div class="col-md-4 col-4 auth-logo">
-                            <a><img src="assets/images/full-logo.png" alt="Logo"></a>
+                            <img class="d-none d-md-block" src="assets/images/full-logo.png" alt="Logo">
+                            <img class="d-block d-md-none" src="assets/images/logo/logo.png" alt="Logo" style="width: 100px">
                         </div>
                         <div class="col-md-8 col-8">
                         </div>
@@ -42,8 +56,8 @@
                             @enderror
                         </div>
                         <div class="form-group position-relative has-icon-left mb-4">
-                            <input type="password" name="password" class="form-control form-control-xl @error('password') is-invalid @enderror" placeholder="Kata Sandi" autocomplete="off" />
-
+                            <input type="password" name="password" id="password" class="form-control form-control-xl @error('password') is-invalid @enderror" placeholder="Kata Sandi" autocomplete="off" />
+                            <span toggle="#password" class="fa fa-fw fa-eye password-toggle"></span>
                             {{-- <div class="form-control-icon">
                                 <i class="bi bi-shield-lock"></i>
                             </div> --}}
@@ -108,5 +122,19 @@
         });
     </script>
 @endif
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.querySelector(".password-toggle");
+        const passwordInput = document.querySelector("#password");
+
+        toggle.addEventListener("click", function () {
+            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+            passwordInput.setAttribute("type", type);
+            this.classList.toggle("fa-eye");
+            this.classList.toggle("fa-eye-slash");
+        });
+    });
+</script>
 
 </html>

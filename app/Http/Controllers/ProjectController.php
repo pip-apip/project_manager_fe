@@ -223,12 +223,16 @@ class ProjectController extends Controller
 
         $response = Http::withToken($accessToken)->post('https://bepm.hanatekindo.com/api/v1/projects', [
             'name' => $request->input('name'),
+            'code' => $request->input('code'),
+            'client' => $request->input('client'),
+            'ppk' => $request->input('ppk'),
+            'support_teams' => $request->input('support_teams'),
+            'value' => $request->input('value'),
             'company_id' => $request->input('company_id'),
+            'project_leader_id' => $request->input('project_leader_id'),
             'start_date' => date('Y-m-d', strtotime($request->input('start_date'))),
             'end_date' => date('Y-m-d', strtotime($request->input('end_date'))),
-            'start_date' => $request->input('start_date'),
-            'end_date' => $request->input('end_date'),
-            'project_leader_id' => $request->input('project_leader_id'),
+            'maintenance_date' => date('Y-m-d', strtotime($request->input('maintenance_date'))),
         ]);
 
         if ($response->json()['status'] !== 201) {
@@ -425,29 +429,38 @@ class ProjectController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'company_id' => ['required', 'not_in:#'],
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-        ]);
+        // $request->validate([
+        //     'name' => 'required|string|max:255',
+        //     'company_id' => ['required', 'not_in:#'],
+        //     'start_date' => 'required|date',
+        //     'end_date' => 'required|date',
+        // ]);
+        $data = [];
+
+        foreach($request->all() as $key => $value){
+            if($key !== '_token' && $key !== 'value' && strpos($key, '_date') === false && $key !== 'support_teams'){
+                $data[$key] = $value;
+            }elseif($key === 'value'){
+                $data[$key] = str_replace('.', '', $value);
+            }elseif(strpos($key, '_date') !== false){
+                $data[$key] = date('Y-m-d', strtotime($value));
+            }elseif($key === 'support_teams'){
+                $data[$key] = json_decode($value, true);;
+            }
+        }
+
+        // dd($data);
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/projects/'. $id, [
-            'name' => $request->input('name'),
-            'company_id' => $request->input('company_id'),
-            'start_date' => date('Y-m-d', strtotime($request->input('start_date'))),
-            'end_date' => date('Y-m-d', strtotime($request->input('end_date'))),
-            'start_date' => $request->input('start_date'),
-            'end_date' => $request->input('end_date'),
-        ]);
+        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/projects/'. $id, $data);
+
+        dd($response->json());
 
         if ($response->json()['status'] == 400) {
             $errors = $response->json()['errors'];
 
-            // Return the errors to the view, keeping old input data
-            return redirect()->back()->withInput()->withErrors($errors);
+            return redirect()->back()->withInput()->with('error',$errors);
         }
 
         return redirect()->route('project.index')->with('success', 'Project edited successfully.');
