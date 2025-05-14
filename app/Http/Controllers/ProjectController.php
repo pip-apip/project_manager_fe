@@ -182,29 +182,36 @@ class ProjectController extends Controller
         $accessToken = session('user.access_token');
         $responseCompanies = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/companies');
 
-        if ($responseCompanies->json()['status'] !== 201) {
+        if ($responseCompanies->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
         }
 
-        $companies = $responseCompanies->json()['data'];
-
         $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users');
 
-        if ($responseUser->json()['status'] !== 201) {
+        if ($responseUser->json()['status'] !== 200) {
+            return redirect()->back()->withErrors('Failed to fetch user data.');
+        }
+
+        $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users?limit=1000');
+
+        if ($responseUser->failed()) {
             return redirect()->back()->withErrors('Failed to fetch user data.');
         }
 
         $users = $responseUser->json()['data'] ?? null;
 
+        $companies = $responseCompanies->json()['data'];
+        $users = $responseUser->json()['data'] ?? null;
         $project = [];
+
         return view('pages.project.form', compact('project', 'companies', 'users'))->with(['title' => 'project', 'status' => 'create']);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
+        dd($request->all());
         // $request->validate([
         //     'name' => 'required|string|max:255',
         //     'company_id' => ['required', 'not_in:#'],
@@ -224,12 +231,23 @@ class ProjectController extends Controller
             'project_leader_id' => $request->input('project_leader_id'),
         ]);
 
-        // dd($response->json());
-
-        if ($response->json()['status'] == 400) {
+        if ($response->json()['status'] !== 201) {
             $errors = $response->json()['errors'];
+            return redirect()->back()->withInput()->withErrors($errors);
+        }
 
-            // Return the errors to the view, keeping old input data
+        $latestproject = $response->json()['data']['id'];
+
+        $dataReq = new Request([
+            'teams' => json_decode($request->input('teams'), true),
+            'project_id' => $latestproject,
+        ]);
+
+        $returnAddTeams = $this->storeTeam($dataReq);
+        // dd($returnAddTeams->getData());
+        if ($returnAddTeams->getData()->status == 'error') {
+            $errors = $returnAddTeams->json()['message'];
+
             return redirect()->back()->withInput()->withErrors($errors);
         }
 
@@ -267,7 +285,7 @@ class ProjectController extends Controller
 
         // dd($response->json());
 
-        if ($response->json()['status'] == 400) {
+        if ($response->json()['status'] !== 201) {
             $errors = $response->json()['errors'];
 
             // Return the errors to the view, keeping old input data
@@ -277,9 +295,23 @@ class ProjectController extends Controller
         return redirect()->route('project.doc', ['id' => $request->input('project_id')])->with('success', 'Project Doc created successfully.');
     }
 
-    public function storeTeam(){
-        $teams= request('team');
-        $project_id = request('project_id');
+    // public function storeTeam(){
+    public function storeTeam(Request $request){
+
+        $teams = $request->input('teams');
+        $project_id = $request->input('project_id');
+
+        if (empty($teams)) {
+            $teams = request('teams');
+        }
+        if (empty($project_id)) {
+            $project_id = request('project_id');
+        }
+
+        // return response()->json([
+        //     'teams' => $teams,
+        //     'project_id' => $project_id
+        // ]);
 
         $accessToken = session('user.access_token');
 
@@ -385,7 +417,7 @@ class ProjectController extends Controller
 
         // dd($project);
 
-        return view('pages.project.form', compact('project', 'companies', 'users'))->with(['title' => 'project', 'status' => 'edit']);
+        return view('pages.project.form-edit', compact('project', 'companies', 'users'))->with(['title' => 'project', 'status' => 'edit']);
     }
 
     /**
