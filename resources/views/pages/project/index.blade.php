@@ -173,7 +173,7 @@
 
 <div class="modal fade text-left w-100" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel33"
     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="myModalLabel33">Detail Proyek</h4>
@@ -184,12 +184,12 @@
             <div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-sm-8">
+                        <div class="col-sm-5">
                             <label><b> Nama Proyek : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="project_name_detail"></p>
                             </div>
-                            <label><b> Nama Perusahaan : </b></label>
+                            <label><b> Nama PT Pemenang : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="company_name_detail"></p>
                             </div>
@@ -214,8 +214,22 @@
                                 <p class="form-control-static" id="director_phone_detail"></p>
                             </div>
                         </div>
+                        <div class="col-sm-3">
+                            <label><b> Nama Klien : </b></label>
+                            <div class="form-group">
+                                <p class="form-control-static" id="project_client_detail"></p>
+                            </div>
+                            <label><b> Nama PPK : </b></label>
+                            <div class="form-group">
+                                <p class="form-control-static" id="ppk_name_detail"></p>
+                            </div>
+                            <label><b> Nilai Proyek : </b></label>
+                            <div class="form-group">
+                                <p class="form-control-static" id="project_value_detail"></p>
+                            </div>
+                        </div>
                         <hr>
-                        <div class="col-sm-8">
+                        <div class="col-sm-5">
                             <label><b> Kontrak Mulai : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="start_project_detail"></p>
@@ -225,6 +239,12 @@
                             <label><b> Kontrak Selesai : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="end_project_detail"></p>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <label><b> Maintenance Akhir : </b></label>
+                            <div class="form-group">
+                                <p class="form-control-static" id="maintenance_project_detail"></p>
                             </div>
                         </div>
                     </div>
@@ -647,14 +667,24 @@
     function showDetail(data){
         console.log(data);
         let onclickDelete = `confirmDelete("` + `{{ url('project/destroy/${data.id}') }}`;
-        $("#project_leader_detail").text(data.project_leader_name);
-        $("#project_name_detail").text(data.name);
+        // let onclickDelete = `confirmDelete("` + `{{ route('project.destroy', ':id') }}`.replace(':id', data.id) + ` ")`;
+
+        $("#project_name_detail").text("("+data.code+") "+data.name);
         $("#company_name_detail").text(data.company_name);
         $("#company_address_detail").text(data.company_address);
+
+        $("#project_leader_detail").text(data.project_leader_name);
         $("#director_name_detail").text(data.company_director_name);
         $("#director_phone_detail").text(data.company_director_phone);
+
+        $("#project_client_detail").text(data.client);
+        $("#ppk_name_detail").text(data.ppk);
+        $("#project_value_detail").text(nilaiFormat(data.value));
+
         $("#start_project_detail").text(dateFormat(data.start_date));
         $("#end_project_detail").text(dateFormat(data.end_date));
+        $("#maintenance_project_detail").text(dateFormat(data.maintenance_date));
+
         $("#editButton").attr("href", `project/form-edit/${data.id}`);
         $("#deleteButton").attr("onclick", onclickDelete);
     }
@@ -680,6 +710,10 @@
 
     function closeModernModal() {
         document.getElementById('modernImageModal').style.display = "none";
+    }
+
+    function nilaiFormat(nilai) {
+        return nilai.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
     }
 </script>
 @endsection

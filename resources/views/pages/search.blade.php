@@ -155,8 +155,9 @@
             return;
         }
 
-        let content_doc = ''; let content_tag = '';
+        let content_doc = '';
         $.each(filteredDocs, function (index, doc) {
+            let content_tag = '';
             $.each(doc.tags, function (indexs, tag) {
                 content_tag += `<span class="badge bg-light-secondary" style="margin:5px;">${tag}</span>`;
             });
@@ -199,7 +200,7 @@
         let modal = $('#readModal');
         modal.find('#activity_name').text(doc.title);
         modal.find('#doc_title').text(doc.title);
-        modal.find('#description').text(doc.description);
+        modal.find('#description').html(doc.description);
         let tagsShow = doc.tags.map(tag =>
                             `<button class="btn btn-info me-2">${tag}</button>`
                         ).join("");

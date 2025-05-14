@@ -68,6 +68,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ $title == 'progress' ? 'active' : ''  }} ">
+                    <a href="{{ route('progress.index') }}" class='sidebar-link'>
+                        <i class="fa-solid fa-hourglass-half"></i>
+                        <span>Progress</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-item {{ $title == 'activity' ? 'active' : ''  }} ">
                     <a href="{{ route('activity.index') }}" class='sidebar-link'>
                         <i class="fa-solid fa-chart-line"></i>

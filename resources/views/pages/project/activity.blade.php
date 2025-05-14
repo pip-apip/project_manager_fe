@@ -30,7 +30,19 @@
                                 <input type="text" class="form-control" value="{{ $project['name'] }}" readonly />
                             </div>
                             <div class="col-md-2">
-                                <label>Nama Perusahaan</label>
+                                <label>Nama Klien</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control" value="{{ $project['client'] }}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Nama PPK</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control" value="{{ $project['ppk'] }}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Nama PT Pemenang</label>
                             </div>
                             <div class="form-group col-md-10">
                                 <input type="text" class="form-control" value="{{ $project['company_name'] }}" readonly />

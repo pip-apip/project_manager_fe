@@ -106,7 +106,7 @@
                     <div class="col-sm-12 col-12 tab">
                         <button class="tablink active" onclick="openTab(event, 'formProject')">Info. Umum</button>
                         <button class="tablink" onclick="openTab(event, 'form2')">Anggota Proyek</button>
-                        <button class="tablink" onclick="openTab(event, 'formTeams')">Team Proyek</button>
+                        {{-- <button class="tablink" onclick="openTab(event, 'formTeams')">Team Proyek</button> --}}
                     </div>
 
                     {{-- Form Section 1 Proyek --}}
@@ -114,6 +114,16 @@
                         <form action="{{ route('project.update', $project['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
+                                <div class="col-md-2">
+                                    <label>Kode Proyek <code>*</code></label>
+                                </div>
+                                <div class="form-group col-md-10">
+                                    <input type="text" placeholder="Masukkan Kode Proyek" class="form-control @error('code') is-invalid @enderror" id="code" name="code" value="{{ old('code', $project ? $project['code'] : '') }}" autocomplete="off" />
+                                    @error('code')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                                 <div class="col-md-2">
                                     <label>Nama Proyek <code>*</code></label>
                                 </div>
@@ -193,6 +203,9 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
+                                    <button type="submit" class="btn btn-primary me-1 mb-1" id="submitButtonPage1">Simpan</button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -234,7 +247,7 @@
                                 </div>
                                 <div class="form-group col-md-4">
                                     <input type="text" class="form-control" id="supporting_team" placeholder="Masukkan Nama Tim Pendukung" />
-                                    <input type="text" id="supporting_team_collection" name="supporting_team" style="display: none">
+                                    <input type="text" id="supporting_team_collection" name="support_teams" style="display: none">
                                 </div>
                                 <div class="col-md-1">
                                     <button class="btn btn-primary" id="addSupportingTeam">Tambah</button>
@@ -254,11 +267,14 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
+                                <button type="submit" class="btn btn-primary me-1 mb-1" id="submitButtonPage2">Simpan</button>
+                            </div>
                         </form>
                     </div>
 
                     {{-- Form Section 3 Team Proyek --}}
-                    <div class="tabcontent" id="formTeams" style="margin-bottom: 1rem; display: none">
+                    {{-- <div class="tabcontent" id="formTeams" style="margin-bottom: 1rem; display: none">
                         <form action="{{ route('project.update', $project['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
@@ -296,8 +312,13 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
+                                <button type="submit"
+                                    class="btn btn-primary me-1 mb-1" id="submitButtonPage3">Simpan</button>
+                            </div>
                         </form>
-                    </div>
+                    </div> --}}
+
                 </div>
             </div>
         </section>
@@ -322,6 +343,7 @@
 
 <script>
     let users = {!! isset($users) ? json_encode($users) : '[]' !!};
+    let project = {!! isset($project) ? json_encode($project) : '[]' !!}
     let userSet = [];
     let teamFix = [];
     let supportTeam = [];
@@ -334,6 +356,12 @@
         $('form').on('submit', function() {
             buttonLoadingStart('submitButton');
         });
+        if(project['support_teams']){
+            for(let i = 0; i < project['support_teams'].length; i++){
+                supportTeam.push(project['support_teams'][i]);
+                // console.log(project['support_teams'][i]);
+            }
+        }
         setUser();
         renderSupportTeam();
     });
