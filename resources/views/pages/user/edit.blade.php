@@ -5,53 +5,51 @@
 @section('content')
 
 <style>
-    /* Style the tab buttons */
-    .tablink {
-        background-color: #fff;
-        color: black;
+    /* Tab container */
+    .tab {
+        overflow: hidden;
+        border-bottom: 2px solid #980003;
+        /* background-color: #F5F5F5; */
+        border-radius: 8px 8px 0 0;
+    }
+
+    /* Tab buttons (tablinks) */
+    .tab button {
+        background-color: #ffffff;
         float: left;
         border: none;
         outline: none;
         cursor: pointer;
-        padding: 14px 16px;
-        font-size: 17px;
-    }
-    .tablink.active {
-        background-color: #eee;
-        color: black;
-    }
-
-    .tablink:hover {
-        background-color: #ddd;
+        padding: 12px 24px;
+        transition: 0.3s;
+        font-size: 16px;
+        color: #333;
+        border-right: 1px solid #ccc;
     }
 
-    /* Style the tab content (hidden by default) */
+    /* Tab buttons on hover */
+    .tab button:hover {
+        background-color: #d9d9d9;
+    }
+
+    /* Tab button when active */
+    .tab button.active {
+        background-color: #980003;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    /* Tab content */
     .tabcontent {
         display: none;
         padding: 20px;
+        border: 1px solid #ccc;
+        border-top: none;
+        background-color: #fff;
+        border-radius: 0 0 8px 8px;
     }
+
 </style>
-
-<script>
-    function openTab(evt, tabName) {
-        let i, tabcontent, tablinks;
-
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-
-        tablinks = document.getElementsByClassName("tablink");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.className += " active";
-    }
-// Open the first tab by default
-//document.getElementsByClassName("tablink")[0].click();
-</script>
 
 <div class="page-heading">
     <div class="page-content">
@@ -71,8 +69,8 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-sm-12 col-12">
-                            <button class="tablink" onclick="openTab(event, 'Tab1')">Info. Umum</button>
+                        <div class="col-sm-12 col-12 tab">
+                            <button class="tablink active" onclick="openTab(event, 'Tab1')">Info. Umum</button>
                             <button class="tablink" onclick="openTab(event, 'Tab2')">Kata Sandi</button>
                         </div>
                         <hr>
@@ -237,6 +235,23 @@
             firstTab.classList.add('active');
         }
     });
+
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
+
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
 </script>
 
 @endsection

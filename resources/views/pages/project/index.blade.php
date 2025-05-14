@@ -91,7 +91,7 @@
                                 </div>
                                 <div class="col-lg-5 col-5">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" name="q" value="{{ session()->has('q') ? session('q') : '' }}" placeholder="Ketik Nama Aktivitas & Klik Enter ..." onkeydown="if (event.key === 'Enter') { event.preventDefault(); this.form.submit(); }">
+                                        <input type="text" class="form-control" name="q" value="{{ session()->has('q') ? session('q') : '' }}" placeholder="Ketik Nama Aktivitias & Klik Enter ..." onkeydown="if (event.key === 'Enter') { event.preventDefault(); this.form.submit(); }">
                                         <button class="btn btn-primary" type="submit" id="button-addon1"><i class="fa-solid fa-magnifying-glass"></i></button>
                                     </div>
                                 </div>
@@ -401,6 +401,7 @@
     });
 
     function teamModal(id, projectName, projectLeader, projectLeaderId, status){
+        console.log(status)
         teams.forEach(function (team) {
             if (team.project_id == id) {
                 teamFix = team.members;
@@ -444,7 +445,7 @@
             `;
         }else{
             footerHtml += `
-                <button type="button" class="btn btn-warning ml-1" onclick="teamModal(${id}, '${projectName}', 'input')" id="submitButton">
+                <button type="button" class="btn btn-warning ml-1" onclick="teamModal(${id}, '${projectName}', '${projectLeader}', ${projectLeaderId}, 'input')" id="submitButton">
                         <i class="fa-solid fa-pen"></i>
                         Edit
                 </button>
@@ -508,7 +509,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             data: {
-                team: teamFix,
+                teams: teamFix,
                 project_id: $('#project_id').val()
             },
             success: function (response) {
