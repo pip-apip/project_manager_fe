@@ -60,9 +60,8 @@ class ProjectController extends Controller
 
         if (session('user.role') != 'SUPERADMIN') {
             $project_ids = session('user.project_id', []);
-            $params['project_id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
+            $params['id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
         }
-
         $responseProject = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/search', $params);
 
         if ($responseProject->failed()) {
