@@ -5,7 +5,7 @@
                 <div class="logo">
                     <div class="row">
                         <div class="col-sm-4 col-4">
-                            <a href="index.html"><img src="{{ asset('assets/images/logo/logo.png') }}" alt="Logo" srcset="" style="width: "></a>
+                            <a href="{{ route('home') }}"><img src="{{ asset('assets/images/logo/logo.png') }}" alt="Logo" srcset="" style="width: "></a>
                         </div>
                         <div class="col-sm-8 col-8">
                             <h5 class="mt-1">Proyek<br> Manajemen</h5>
@@ -68,7 +68,7 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ $title == 'progress' ? 'active' : ''  }} ">
+                <li class="sidebar-item {{ $title == 'progress' ? 'active' : ''  }} " style="display: none;">
                     <a href="{{ route('progress.index') }}" class='sidebar-link'>
                         <i class="fa-solid fa-hourglass-half"></i>
                         <span>Progress</span>

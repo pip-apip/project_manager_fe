@@ -92,9 +92,15 @@
                                         <a href="{{ route('activity.doc', $act['id']) }}" class="btn btn-sm btn-info rounded-pill">
                                             <i class="fa-solid fa-file"></i>
                                         </a>
+                                        @if ($act['activity_doc'] === false)
                                         <a href="javascript:void(0)" class="btn btn-sm btn-danger rounded-pill" onclick="confirmDelete('{{ route('activity.destroy', $act['id']) }}')">
                                             <i class="fa-solid fa-trash"></i>
                                         </a>
+                                        @else
+                                        <a class="btn btn-sm btn-danger rounded-pill disabled">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach

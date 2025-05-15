@@ -455,8 +455,6 @@ class ProjectController extends Controller
 
         $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/projects/'. $id, $data);
 
-        dd($response->json());
-
         if ($response->json()['status'] == 400) {
             $errors = $response->json()['errors'];
 
@@ -473,10 +471,10 @@ class ProjectController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/projects/'.$id);
+        $responseDelete = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/projects/'.$id);
 
-        if ($response->json()['status'] == 400 || $response->json()['status'] == 500) {
-            $errors = $response->json()['errors'];
+        if ($responseDelete->json()['status'] !== 200) {
+            $errors = $responseDelete->json()['errors'];
 
             return redirect()->back()->withInput()->withErrors($errors);
         }
