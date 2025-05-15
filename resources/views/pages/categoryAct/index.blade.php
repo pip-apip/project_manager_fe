@@ -47,7 +47,7 @@
                                                     {{ $project['name'] }}
                                                 </option>
                                             @endforeach
-                                            <option value="0">Lain - lain</option>
+                                            <option value="0" {{ session()->has('project_id') && session('project_id') == 0 ? 'selected' : '' }}>Lain - lain</option>
                                         </select>
                                     </fieldset>
                                 </div>

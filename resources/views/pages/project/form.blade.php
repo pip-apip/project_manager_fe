@@ -68,14 +68,20 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    @if ($status === 'create')
-                        <form action="{{ route('project.store') }}" method="POST" class="form form-vertical" enctype="multipart/form-data">
-                    @elseif ($status === 'edit')
-                        <form action="{{ route('project.update', $project['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data">
-                    @endif
+                        <form action="{{ route('project.store') }}" method="POST" class="form form-vertical" enctype="multipart/form-data" id="form">
                     @csrf
                         {{-- Form Section 1 Proyek --}}
                         <div class="row" id="formProject">
+                            <div class="col-md-2">
+                                <label>Kode Proyek <code>*</code></label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" placeholder="Masukkan Kode Proyek" class="form-control @error('code') is-invalid @enderror" id="code" name="code" value="{{ old('code', $project ? $project['code'] : '') }}" autocomplete="off" />
+                                @error('code')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <div class="col-md-2">
                                 <label>Nama Proyek <code>*</code></label>
                             </div>
@@ -109,8 +115,8 @@
                             <div class="form-group col-md-10">
                                 <div class="input-group">
                                     <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                    <input type="text" class="form-control @error('nilai_project') is-invalid @enderror" name="nilai_project" value="{{ old('nilai_project', $project ? $project['nilai_project'] : '') }}" autocomplete="off" placeholder="Masukkan Nilai Proyek"/>
-                                    @error('nilai_project')
+                                    <input type="text" class="form-control @error('value') is-invalid @enderror" name="value" value="{{ old('value', $project ? $project['value'] : '') }}" autocomplete="off" placeholder="Masukkan Nilai Proyek"/>
+                                    @error('value')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -192,7 +198,7 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <input type="text" class="form-control" id="supporting_team" placeholder="Masukkan Nama Tim Pendukung" />
-                                <input type="text" id="supporting_team_collection" name="supporting_team" style="display: none">
+                                <input type="text" id="supporting_team_collection" name="support_teams">
                             </div>
                             <div class="col-md-1">
                                 <button class="btn btn-primary" id="addSupportingTeam">Tambah</button>
@@ -505,37 +511,39 @@
         renderSupportTeam();
     }
 
-    // Format input nilai_project
-    const input = document.querySelector('input[name="nilai_project"]');
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector('input[name="value"]');
+        const form = document.getElementById('form');
 
-    input.addEventListener('input', function (e) {
-        let value = this.value.replace(/[^\d]/g, '');
-        if (!value) {
-            this.value = '';
-            return;
+        input.addEventListener('input', function () {
+            let value = this.value.replace(/[^\d]/g, '');
+            this.value = value ? formatRupiah(value) : '';
+        });
+
+        form.addEventListener('submit', function () {
+            const raw = input.value.replace(/[^0-9]/g, '');
+            input.value = raw;
+        });
+
+        function formatRupiah(angka) {
+            let numberString = angka.toString();
+            let sisa = numberString.length % 3;
+            let rupiah = numberString.substr(0, sisa);
+            let ribuan = numberString.substr(sisa).match(/\d{3}/g);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            return rupiah;
         }
-        
-        this.value = formatRupiah(value);
-    });
 
-    function formatRupiah(angka) {
-        let numberString = angka.toString();
-        let sisa = numberString.length % 3;
-        let rupiah = numberString.substr(0, sisa);
-        let ribuan = numberString.substr(sisa).match(/\d{3}/g);
-
-        if (ribuan) {
-            let separator = sisa ? '.' : '';
-            rupiah += separator + ribuan.join('.');
+        // Format on load
+        if (input.value) {
+            const raw = input.value.replace(/[^0-9]/g, '');
+            input.value = formatRupiah(raw);
         }
-
-        return rupiah;
-    }
-
-    const form = document.getElementById('form');
-    form.addEventListener('submit', function () {
-        const raw = input.value.replace(/[^0-9]/g, '');
-        input.value = raw;
     });
 </script>
 
