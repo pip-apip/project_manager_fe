@@ -126,6 +126,11 @@
                                         <td>{{ $project['company_name'] }}</td>
                                         <td class="text-center">
                                             {{-- <span class="badge {{ $project['status'] ? 'bg-success' : 'bg-danger'}}"> --}}
+                                            <button class="badge bg-danger border-0">
+                                                {{-- {{$project['status']}} --}}
+                                                Undefined
+                                            </button>
+
                                             <span class="badge bg-danger">
                                                 {{-- {{$project['status']}} --}}
                                                 Undefined
