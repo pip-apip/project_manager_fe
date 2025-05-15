@@ -132,20 +132,17 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            {{-- <a href="{{ route('project.edit', $project['id']) }}" class="btn btn-sm btn-warning rounded-pill" title="Edit">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </a> --}}
-                                            <a onclick="showDetail({{ json_encode($project) }})" class="btn btn-sm btn-warning rounded-pill" data-bs-toggle="modal" data-bs-target="#detailModal">
+                                            <a onclick="showDetail({{ json_encode($project) }})" class="btn btn-sm btn-info rounded-pill" data-bs-toggle="modal" data-bs-target="#detailModal">
                                                 <i class="fa-solid fa-ellipsis-vertical"></i>
                                             </a>
-                                            <a href="{{ route('project.doc', $project['id']) }}" class="btn btn-sm btn-info rounded-pill">
-                                                <i class="fa-solid fa-file"></i>
-                                            </a>
-                                            <a href="{{ route('project.activity', $project['id']) }}" class="btn btn-sm btn-secondary rounded-pill">
-                                                <i class="fa-solid fa-chart-line"></i>
-                                            </a>
-                                            <button type="button" onclick="teamModal({{ $project['id'] }}, `{{ $project['name'] }}`, `{{ $project['project_leader_name'] }}`, {{ $project['project_leader_id'] }}, ``)" class="btn btn-sm btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#teamModal">
+                                            <button type="button" onclick="teamModal({{ $project['id'] }}, `{{ $project['name'] }}`, `{{ $project['project_leader_name'] }}`, {{ $project['project_leader_id'] }}, ``)" class="btn btn-sm btn-secondary rounded-pill" data-bs-toggle="modal" data-bs-target="#teamModal">
                                                 <i class="fa-solid fa-user-group"></i>
+                                            </button>
+                                            <a href="{{ route('project.edit', $project['id']) }}" class="btn btn-sm btn-warning rounded-pill">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-primary rounded-pill" onclick="confirmDelete('{{ route('project.destroy', $project['id']) }}')">
+                                                <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -189,7 +186,7 @@
                             <div class="form-group">
                                 <p class="form-control-static" id="project_name_detail"></p>
                             </div>
-                            <label><b> Nama PT Pemenang : </b></label>
+                            <label><b> PT Pemenang : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="company_name_detail"></p>
                             </div>
@@ -201,11 +198,11 @@
                             </div>
                         </div>
                         <div class="col-sm-4">
-                            <label><b> Nama Pimpinan Proyek : </b></label>
+                            <label><b> Nama PL : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="project_leader_detail"></p>
                             </div>
-                            <label><b> Nama Direktur : </b></label>
+                            <label><b> Direktur PT Pemenang : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="director_name_detail"></p>
                             </div>
@@ -250,12 +247,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a class="btn btn-warning ml-1" id="editButton">
-                        <i class="fa-solid fa-pen"></i> Edit
+                    <a class="btn btn-info ml-1" id="docButton">
+                        <i class="fa-solid fa-file"></i> Dokumen Proyek
                     </a>
-                    <button type="button" class="btn btn-danger ml-1" id="deleteButton">
-                        <i class="fa-solid fa-trash"></i> Hapus
-                    </button>
+                    <a class="btn btn-danger ml-1" id="activityButton">
+                        <i class="fa-solid fa-chart-line"></i> Aktivitas Proyek
+                    </a>
                 </div>
             </div>
         </div>
@@ -666,7 +663,7 @@
 
     function showDetail(data){
         console.log(data);
-        let onclickDelete = `confirmDelete("` + `{{ url('project/destroy/${data.id}') }}`;
+        let onclickDelete = `confirmDelete("` + `{{ url('project/destroy/${data.id}') }} ")`;
         // let onclickDelete = `confirmDelete("` + `{{ route('project.destroy', ':id') }}`.replace(':id', data.id) + ` ")`;
 
         $("#project_name_detail").text("("+data.code+") "+data.name);
@@ -685,8 +682,9 @@
         $("#end_project_detail").text(dateFormat(data.end_date));
         $("#maintenance_project_detail").text(dateFormat(data.maintenance_date));
 
-        $("#editButton").attr("href", `project/form-edit/${data.id}`);
-        $("#deleteButton").attr("onclick", onclickDelete);
+        $("#docButton").attr("href", "{{ route('project.doc', ':id') }}".replace(':id', data.id));
+        $("#activityButton").attr("href", "{{ route('project.activity', ':id') }}".replace(':id', data.id));
+        // $("#deleteButton").attr("onclick", onclickDelete);
     }
 
     function dateFormat(dateString) {

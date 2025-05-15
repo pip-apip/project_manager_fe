@@ -48,7 +48,7 @@ class ProgressController extends Controller
             );
         }
 
-        return view('pages.progress.index', compact('results'))->with('title', 'Progress');
+        return view('pages.progress.index', compact('results'))->with('title', 'progress');
     }
 
     /**
@@ -87,7 +87,7 @@ class ProgressController extends Controller
         $project = $responseProject->json()['data'][0];
         $activityCategory = $responseActivityCategory->json()['data'];
 
-        return view('pages.progress.project', compact('project','activityCategory'))->with('title', 'Progress');
+        return view('pages.progress.project', compact('project','activityCategory'))->with('title', 'progress');
     }
 
     /**

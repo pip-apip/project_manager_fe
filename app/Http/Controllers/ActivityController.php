@@ -407,13 +407,26 @@ class ActivityController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/activities/'.$id);
+        $responseGet = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activities/'.$id);
 
-        if ($response->json()['status'] == 400 || $response->json()['status'] == 500) {
-            $errors = $response->json()['errors'];
+        $author_id = $responseGet->json()['data'][0]['author_id'] ?? null;
+        $acitivity_doc_status = $responseGet->json()['data'][0]['activity_doc'] ?? null;
+        
+        if ($acitivity_doc_status) {
+            return redirect()->back()->with('error', 'Aktivitas tidak dapat dihapus karena sudah memiliki dokumen.');
+        }
+
+        $responseDelete = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/activities/'.$id);
+
+        if ($responseDelete->json()['status'] !== 200) {
+            $errors = $responseDelete->json()['errors'];
 
             return redirect()->back()->withInput()->withErrors($errors);
         }
+
+        $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. $author_id, [
+            'is_process' => false,
+        ]);
 
         return redirect()->route('activity.index')->with('success', 'Activity deleted successfully.');
     }

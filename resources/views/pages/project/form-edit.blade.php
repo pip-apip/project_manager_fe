@@ -111,7 +111,7 @@
 
                     {{-- Form Section 1 Proyek --}}
                     <div class="tabcontent" id="formProject" style="margin-bottom: 1rem; display: block">
-                        <form action="{{ route('project.update', $project['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data">
+                        <form action="{{ route('project.update', $project['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data" id="formEdit1">
                             @csrf
                             <div class="row">
                                 <div class="col-md-2">
@@ -212,7 +212,7 @@
 
                     {{-- Form Section 2 Anggota Proyek --}}
                     <div class="tabcontent" id="form2" style="margin-bottom: 1rem; display: none">
-                        <form action="{{ route('project.update', $project['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data">
+                        <form action="{{ route('project.update', $project['id']) }}" method="POST" class="form form-vertical" enctype="multipart/form-data" id="formEdit2">
                             @csrf
                             <div class="row">
                                 <div class="col-md-2">
@@ -353,9 +353,19 @@
     });
 
     $(document).ready(function() {
-        $('form').on('submit', function() {
-            buttonLoadingStart('submitButton');
+        $('#submitButtonPage1').on('click', function() {
+            buttonLoadingStart('submitButtonPage1');
+            const input = document.querySelector('input[name="value"]');
+            const raw = input.value.replace(/[^0-9]/g, '');
+            input.value = raw;
+            $('#formEdit1').submit();
         });
+
+        $('#submitButtonPage2').on('click', function() {
+            buttonLoadingStart('submitButtonPage2');
+            $('#formEdit2').submit();
+        });
+
         if(project['support_teams']){
             for(let i = 0; i < project['support_teams'].length; i++){
                 supportTeam.push(project['support_teams'][i]);
@@ -530,36 +540,38 @@
     }
 
     // Format input nilai_project
-    const input = document.querySelector('input[name="value"]');
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector('input[name="value"]');
 
-    input.addEventListener('input', function (e) {
-        let value = this.value.replace(/[^\d]/g, '');
-        if (!value) {
-            this.value = '';
-            return;
+        input.addEventListener('input', function (e) {
+            let value = this.value.replace(/[^\d]/g, '');
+            if (!value) {
+                this.value = '';
+                return;
+            }
+
+            this.value = formatRupiah(value);
+        });
+
+        // Jalankan formatting saat pertama kali halaman dimuat
+        if (input.value) {
+            const value = input.value.replace(/[^\d]/g, '');
+            input.value = formatRupiah(value);
         }
 
-        this.value = formatRupiah(value);
-    });
+        function formatRupiah(angka) {
+            let numberString = angka.toString();
+            let sisa = numberString.length % 3;
+            let rupiah = numberString.substr(0, sisa);
+            let ribuan = numberString.substr(sisa).match(/\d{3}/g);
 
-    function formatRupiah(angka) {
-        let numberString = angka.toString();
-        let sisa = numberString.length % 3;
-        let rupiah = numberString.substr(0, sisa);
-        let ribuan = numberString.substr(sisa).match(/\d{3}/g);
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
 
-        if (ribuan) {
-            let separator = sisa ? '.' : '';
-            rupiah += separator + ribuan.join('.');
+            return rupiah;
         }
-
-        return rupiah;
-    }
-
-    const form = document.getElementById('form');
-    form.addEventListener('submit', function () {
-        const raw = input.value.replace(/[^0-9]/g, '');
-        input.value = raw;
     });
 
     // Tab Functionality
