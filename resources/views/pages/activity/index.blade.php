@@ -79,11 +79,15 @@
                                     <td>{{ $act['project_name'] }}</td>
                                     <td>{{ $act['title'] }}</td>
                                     <td class="text-center">
-                                        {{-- <span class="badge {{ $project['status'] ? 'bg-success' : 'bg-danger'}}"> --}}
-                                        <span class="badge bg-danger">
-                                            {{-- {{$project['status']}} --}}
-                                            Undefined
+                                        @if($act['activity_doc'] === false)
+                                        <span class="badge bg-warning">
+                                            On Progress
                                         </span>
+                                        @else
+                                        <span class="badge bg-success">
+                                            Done
+                                        </span>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         <!-- <a href="{{ route('activity.edit', $act['id']) }}" class="btn btn-sm btn-warning rounded-pill">
