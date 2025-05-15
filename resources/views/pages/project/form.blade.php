@@ -198,7 +198,7 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <input type="text" class="form-control" id="supporting_team" placeholder="Masukkan Nama Tim Pendukung" />
-                                <input type="text" id="supporting_team_collection" name="support_teams">
+                                <input type="text" id="supporting_team_collection" name="support_teams" style="display: none">
                             </div>
                             <div class="col-md-1">
                                 <button class="btn btn-primary" id="addSupportingTeam">Tambah</button>
