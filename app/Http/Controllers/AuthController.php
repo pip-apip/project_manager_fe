@@ -57,6 +57,19 @@ class AuthController extends Controller
                 session(['user.project_id' => []]);
             }
 
+            $responsePL = Http::withToken($response->json('data.access_token'))->get('https://bepm.hanatekindo.com/api/v1/projects/search?project_leader_id='.$response->json('data.id').'&limit=1000');
+            if($responsePL->json('data')){
+                $projects = $responsePL->json('data');
+                $projectIds = [];
+                foreach ($projects as $project) {
+                    $projectIds[] = $project['id'];
+                }
+
+                session(['user.project_id' => array_merge(session('user.project_id'), $projectIds)]);
+            } else {
+                session(['user.project_id' => []]);
+            }
+
             return redirect()->route('home')->with('success', 'Login successful.');
 
         } elseif ($response->json('status') === 401) {
