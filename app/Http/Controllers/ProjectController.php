@@ -62,7 +62,11 @@ class ProjectController extends Controller
             $project_ids = session('user.project_id', []);
             $params['id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
         }
+        
+        // $startTimeProject = microtime(true);
         $responseProject = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/search', $params);
+        // $endTimeProject = microtime(true);
+        // $responseTimeProject = $endTimeProject - $startTimeProject;
 
         if ($responseProject->failed()) {
             return redirect()->back()->withErrors('Failed to fetch activities.');
@@ -71,7 +75,10 @@ class ProjectController extends Controller
         $total = $responseProject->json()['pagination']['total'] ?? null;
         $projects = $responseProject->json()['data'] ?? null;
 
+        // $startTimeUser = microtime(true);
         $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users?limit=1000');
+        // $endTimeUser = microtime(true);
+        // $responseTimeUser = $endTimeUser - $startTimeUser;
 
         if ($responseUser->failed()) {
             return redirect()->back()->withErrors('Failed to fetch user data.');
@@ -79,7 +86,10 @@ class ProjectController extends Controller
 
         $users = $responseUser->json()['data'] ?? null;
 
+        // $startTimeTeam = microtime(true);
         $responseTeam = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/project-teams?limit=1000');
+        // $endTimeTeam = microtime(true);
+        // $responseTimeTeam = $endTimeTeam - $startTimeTeam;
 
         if ($responseTeam->failed()) {
             return redirect()->back()->withErrors('Failed to fetch user data.');
@@ -124,6 +134,15 @@ class ProjectController extends Controller
                 ['path' => url('project')]
             );
         }
+
+        // dd([
+        //     'projects_response_time' => $responseTimeProject . ' seconds',
+        //     'users_response_time' => $responseTimeUser . ' seconds',
+        //     'teams_response_time' => $responseTimeTeam . ' seconds',
+        //     'projects' => $projects,
+        //     'users' => $users,
+        //     'groupedTeams' => $groupedTeams
+        // ]);
 
         return view('pages.project.index', compact('results', 'users', 'groupedTeams'))->with([
             'title' => 'project'
@@ -261,12 +280,12 @@ class ProjectController extends Controller
      */
     public function storeDoc(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:100',
-            'file' => 'required|file|mimes:pdf|max:2048',
-            'project_id' => 'required',
-            'admin_doc_category_id' => 'required',
-        ]);
+        // $request->validate([
+        //     'title' => 'required|string|max:100',
+        //     'file' => 'required|file|mimes:pdf|max:2048',
+        //     'project_id' => 'required',
+        //     'admin_doc_category_id' => 'required',
+        // ]);
 
         $accessToken = session('user.access_token');
         $file = $request->file('file');
@@ -370,7 +389,7 @@ class ProjectController extends Controller
             return redirect()->back()->withErrors('Failed to fetch doc project data.');
         }
 
-        $responseCategoryDocAdmin = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/admin-doc-categories');
+        $responseCategoryDocAdmin = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/admin-doc-categories/search?limit=1000');
 
         if ($responseCategoryDocAdmin->failed()) {
             return redirect()->back()->withErrors('Failed to fetch doc category of administration project data.');

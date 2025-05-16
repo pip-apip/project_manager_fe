@@ -210,8 +210,7 @@ class ActivityController extends Controller
 
         if ($response->json()['status'] !== 201) {
             $errors = $response->json()['errors'];
-            // return redirect()->back()->withInput()->withErrors($errors);
-            dd($response->json());
+            return redirect()->back()->withInput()->withErrors($errors);
         }
 
         $latestActivity = $response->json()['data']['id'];
@@ -300,9 +299,11 @@ class ActivityController extends Controller
 
         $response = $http->post('https://bepm.hanatekindo.com/api/v1/activity-docs');
 
-        $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'), [
-            'is_process' => FALSE,
-        ]);
+        if ($response->json()['status'] === 201) {
+            $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'), [
+                'is_process' => FALSE,
+            ]);
+        }
 
         $responseData = $response->json();
 
@@ -411,7 +412,7 @@ class ActivityController extends Controller
 
         $author_id = $responseGet->json()['data'][0]['author_id'] ?? null;
         $acitivity_doc_status = $responseGet->json()['data'][0]['activity_doc'] ?? null;
-        
+
         if ($acitivity_doc_status) {
             return redirect()->back()->with('error', 'Aktivitas tidak dapat dihapus karena sudah memiliki dokumen.');
         }

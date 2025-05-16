@@ -34,15 +34,22 @@
     }
 
     .scrollable-table thead th input[type="text"]:focus {
-    outline: none;
-    box-shadow: none;
-    border-color: #ccc; /* atau warna border default yang kamu mau */
-}
+        outline: none;
+        box-shadow: none;
+        border-color: #ccc; /* atau warna border default yang kamu mau */
+    }
 
     .modal-body {
         max-height: 70vh;
         overflow-y: auto;
     }
+
+button.badge,
+button:focus,
+button:active {
+    outline: none;
+    box-shadow: none;
+}
 </style>
 
 <div class="page-heading">
@@ -119,22 +126,37 @@
                                 @endphp --}}
                             @if(is_object($results) && method_exists($results, 'firstItem'))
                                 @foreach ($results as $project)
+                                @php
+                                    $badge_bg = '';
+                                    if($project['status'] == 'WAITING'){
+                                        $badge_bg = 'bg-warning';
+                                    }else if($project['status'] == 'ON PROGRESS'){
+                                        $badge_bg = 'bg-info';
+                                    }
+                                    else if($project['status'] == 'CLOSED'){
+                                        $badge_bg = 'bg-success';
+                                    }
+                                @endphp
                                     <tr>
                                         <td class="text-center">{{ \Carbon\Carbon::parse($project['start_date'])->translatedFormat('d-m-Y') }}</td>
                                         <td class="text-center">{{ \Carbon\Carbon::parse($project['end_date'])->translatedFormat('d-m-Y') }}</td>
                                         <td>{{ $project['name'] }}</td>
                                         <td>{{ $project['company_name'] }}</td>
                                         <td class="text-center">
-                                            {{-- <span class="badge {{ $project['status'] ? 'bg-success' : 'bg-danger'}}"> --}}
-                                            <button class="badge bg-danger border-0">
-                                                {{-- {{$project['status']}} --}}
-                                                Undefined
+                                            @if(session('user.role') == 'SUPERADMIN')
+                                            <button class="badge {{ $badge_bg }} border-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                {{ $project['status'] ?? 'Undefined' }}
                                             </button>
-
+                                            <div class="dropdown-menu" style="">
+                                                <button class="dropdown-item {{ $project['status'] == 'WAITING' ? 'active' : '' }}" onclick="changeStatus({{ $project['id'] }}, 'WAITING')">WAITING</button>
+                                                <button class="dropdown-item {{ $project['status'] == 'ON PROGRESS' ? 'active' : '' }}" onclick="changeStatus({{ $project['id'] }}, 'ON PROGRESS')">ON PROGRESS</button>
+                                                <button class="dropdown-item {{ $project['status'] == 'CLOSED' ? 'active' : '' }}" onclick="changeStatus({{ $project['id'] }}, 'CLOSED')">CLOSED</button>
+                                            </div>
+                                            @else
                                             <span class="badge bg-danger">
-                                                {{-- {{$project['status']}} --}}
-                                                Undefined
+                                                {{$project['status']}}
                                             </span>
+                                            @endif
                                         </td>
                                         <td class="text-center">
                                             <a onclick="showDetail({{ json_encode($project) }})" class="btn btn-sm btn-info rounded-pill" data-bs-toggle="modal" data-bs-target="#detailModal">
@@ -225,7 +247,7 @@
                             <div class="form-group">
                                 <p class="form-control-static" id="ppk_name_detail"></p>
                             </div>
-                            <label><b> Nilai Proyek : </b></label>
+                            <label><b> Nilai Kontrak : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="project_value_detail"></p>
                             </div>
@@ -664,6 +686,43 @@
                 window.location.href = url;
             }
         });
+    }
+
+    function changeStatus(id, status){
+        $.ajax({
+            url: `https://bepm.hanatekindo.com/api/v1/projects/${id}`,
+            type: "PATCH",
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + @json(session('user.access_token')),
+            },
+            data: {
+                status: status
+                // _token: "{{ csrf_token() }}"
+            },
+            success: function (response) {
+                console.log(response);
+                if (response.status == 200) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            }
+        })
     }
 
     function showDetail(data){
