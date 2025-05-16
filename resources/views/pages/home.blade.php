@@ -206,7 +206,7 @@
             $('#recent-activity').append(`
                 <div class="recent-message d-flex px-0 py-2">
                     <div class="name ms-4">
-                        <h5 class="mb-1">${recent[i].project}</h5>
+                        <h5 class="mb-1">${dateFormat(recent[i].start_date)}</h5>
                         <h6 class="text-muted mb-0">${recent[i].title}</h6>
                     </div>
                 </div>
@@ -321,6 +321,20 @@
 
         var chartProfileVisit = new ApexCharts(document.querySelector("#chart-profile-visit"), lineOptions);
         chartProfileVisit.render();
+    }
+
+    function dateFormat(dateString) {
+        let [year, month, day] = dateString.split("-");
+
+        let date = new Date(year, month - 1, day);
+
+        let formattedDate = new Intl.DateTimeFormat("id-ID", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }).format(date);
+
+        return formattedDate;
     }
 
 </script>

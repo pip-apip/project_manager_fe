@@ -152,12 +152,12 @@
                                 </fieldset>
 
                                 <div class="col-md-2">
-                                    <label>Nilai Proyek <code>*</code></label>
+                                    <label>Nilai Kontrak <code>*</code></label>
                                 </div>
                                 <div class="form-group col-md-10">
                                     <div class="input-group">
                                         <span class="input-group-text" id="basic-addon1">Rp.</span>
-                                        <input type="text" class="form-control @error('value') is-invalid @enderror" name="value" value="{{ old('value', $project ? $project['value'] : '') }}" autocomplete="off" placeholder="Masukkan Nilai Proyek"/>
+                                        <input type="text" class="form-control @error('value') is-invalid @enderror" name="value" value="{{ old('value', $project ? $project['value'] : '') }}" autocomplete="off" placeholder="Masukkan Nilai Kontrak"/>
                                         @error('value')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror

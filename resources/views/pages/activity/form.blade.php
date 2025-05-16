@@ -180,7 +180,6 @@
         </section>
     </div>
 </div>
-
 <div class="modal fade text-left w-100" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel33" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
@@ -287,7 +286,7 @@
 
 <script>
     $(document).ready(function() {
-        console.log({!! json_encode($projects) !!})
+        // console.log({!! json_encode($projects) !!})
         $('form').on('submit', function() {
             // $('#fullPageLoader').show();
             buttonLoadingStart('submitButton');
@@ -302,7 +301,7 @@
     let access_token = @json(session('user.access_token'));
 
     document.addEventListener("DOMContentLoaded", function () {
-        console.log(JSON.stringify(@json(session('lastRoute')), null, 2));
+        // console.log(JSON.stringify(@json(session('lastRoute')), null, 2));
     });
 
     $(document).ready(function() {
@@ -337,7 +336,7 @@
             // },
             success: function(response) {
                 $('#activity_category_id').prop('disabled', false);
-                console.log(response);
+                // console.log(response);
                 const $select = $('#activity_category_id');
                 $select.empty();
                 $select.append('<option value="">Pilih Kategori</option>');
@@ -350,7 +349,7 @@
                     if (!grouped[group]) grouped[group] = [];
                     grouped[group].push(category);
                 });
-                console.log(grouped);
+                // console.log(grouped);
 
                 const sortedGroups = Object.keys(grouped).sort((a, b) => {
                     return (isNaN(b) ? b : +b) - (isNaN(a) ? a : +a);

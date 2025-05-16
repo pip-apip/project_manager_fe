@@ -228,10 +228,6 @@
     $activity = $data['activity'][0];
     $doc = $data['docActivity'];
     $categoryDoc = $data['categoryDoc'];
-@endphp
-
-
-@php
     $lastRoute = session()->get('lastRoute');
     $lastRoute = $lastRoute ? explode(',', $lastRoute) : [];
 @endphp
@@ -293,8 +289,12 @@
             <div class="row">
                 <div class="col-sm-12" id="tagsSearch">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h1 class="card-title">Dokumen Aktivitas</h1>
+                            <div>
+                                <button class="btn btn-warning btn-sm me-2" id="actionButton" onclick="editDoc()"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger btn-sm" id="deleteButton" onclick="confirmDelete('{{ route('activity.doc.delete', ':id') }}')"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
                         <div class="card-body" id="form_MOM" style="display: none">
                             <form action="" id="form" class="form form-vertical">
@@ -373,8 +373,46 @@
                                 </div>
                                 {{-- @if ($data['docActivity'] !== []) --}}
                                 <div class="col-sm-12">
-                                    <label><b>Dokumentasi :</b></label>
-                                    <table style="width: 100%">
+                                    <label class="mb-2"><b>Dokumentasi :</b></label>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped" id="table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 5%" class="text-center">No</th>
+                                                    <th style="width: 60%" >Nama File</th>
+                                                    <th style="width: 11%" class="text-center">Extension</th>
+                                                    <th style="width: 15%" class="text-center">Ukuran</th>
+                                                    <th style="width: 9%" class="text-center">Preview</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="table-body">
+                                                @php $i = 1; $url = 'https://bepm.hanatekindo.com/';@endphp
+                                                @foreach ($data['docActivity'][0]['files'] as $doc)
+                                                    <tr>
+                                                        <td class="text-center">{{ $i }}</td>
+                                                        <td>{{ pathinfo($doc, PATHINFO_FILENAME) }}</td>
+                                                        <td class="text-center">{{ pathinfo($doc, PATHINFO_EXTENSION) }}</td>
+                                                        <td class="text-center">
+                                                            {{ file_exists($doc) ? round(filesize($doc) / 1024, 2) . ' KB' : 'File not found' }}
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @if (pathinfo($doc, PATHINFO_EXTENSION) == 'pdf')
+                                                                <a href="{{ $url . $doc }}" target="_blank" style="text-decoration: none; color: grey; font-size: 20px;">
+                                                                    <i class="fa-solid fa-file-pdf"></i>
+                                                                </a>
+                                                            @else
+                                                                <a onclick="openModernModal('{{ $url . $doc }}')" style="text-decoration: none; color: grey; font-size: 20px; cursor: pointer">
+                                                                    <i class="fa-solid fa-file-image"></i>
+                                                                </a>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                    @php $i++; @endphp
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {{-- <table style="width: 100%">
                                         <tr>
                                             @if($data['docActivity'] !== [])
                                             @php $url = "https://bepm.hanatekindo.com"; $i = 0; @endphp
@@ -395,7 +433,7 @@
                                             @endforeach
                                             @endif
                                         </tr>
-                                    </table>
+                                    </table> --}}
                                 </div>
                                 {{-- @endif --}}
                             </div>
@@ -600,6 +638,38 @@
         $('#btnDelete').attr('onclick', `confirmDelete('${"{{ route('activity.doc.delete', ':id') }}".replace(':id', id)}')`);
     }
 
+    function editDoc() {
+        $('#actionButton').attr('onclick', 'cancelEdit()').attr('class', 'btn btn-secondary btn-sm').html('<i class="fa-solid fa-xmark"></i>');
+        let docData = doc[0];
+        if (!docData) return;
+
+        $('#show_MOM').hide();
+        $('#form_MOM').show();
+
+        $('#activity_id').val(docData.activity_id);
+        $('#title_activity_doc').val(docData.title);
+        $('#category_id').val(docData.activity_doc_category_id);
+
+        quill.clipboard.dangerouslyPasteHTML(docData.description);
+        console.log(docData.description);
+
+        tags = docData.tags || [];
+        renderTags();
+
+        selectedFiles = [];
+        document.getElementById('file-upload').value = "";
+        document.getElementById('file-preview').style.display = 'none';
+        document.getElementById('upload-text').style.display = 'block';
+
+        $('#submitButton').text('Perbarui').attr('onclick', 'updateDoc()');
+    }
+
+    function cancelEdit() {
+        $('#actionButton').attr('onclick', 'editDoc()').attr('class', 'btn btn-warning btn-sm').html('<i class="fa-solid fa-pen"></i>');
+        $('#show_MOM').show();
+        $('#form_MOM').hide();
+    }
+
     function storeDoc() {
         buttonLoadingStart("submitButton");
         let formData = new FormData(document.getElementById("form"));
@@ -615,7 +685,7 @@
             processData: false,
             contentType: false,
             success: function (response) {
-                console.log(response);
+                console.log('response',response);
                 buttonLoadingEnd("submitButton");
                 if(response.status === 400 || response.status === 500){
                     Swal.fire({
