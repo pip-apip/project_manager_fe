@@ -291,10 +291,12 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h1 class="card-title">Dokumen Aktivitas</h1>
+                            @if($data['docActivity'])
                             <div>
                                 <button class="btn btn-warning btn-sm me-2" id="actionButton" onclick="editDoc()"><i class="fa-solid fa-pen"></i></button>
                                 <button class="btn btn-danger btn-sm" id="deleteButton" onclick="confirmDelete('{{ route('activity.doc.delete', ':id') }}')"><i class="fa-solid fa-trash"></i></button>
                             </div>
+                            @endif
                         </div>
                         <div class="card-body" id="form_MOM" style="display: none">
                             <form action="" id="form" class="form form-vertical">
@@ -386,22 +388,23 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="table-body">
-                                                @php $i = 1; $url = 'https://bepm.hanatekindo.com/';@endphp
+                                                @php $i = 1; $url = 'https://bepm.hanatekindo.com/storage/';@endphp
+                                                @if ($data['docActivity'])
                                                 @foreach ($data['docActivity'][0]['files'] as $doc)
                                                     <tr>
                                                         <td class="text-center">{{ $i }}</td>
-                                                        <td>{{ pathinfo($doc, PATHINFO_FILENAME) }}</td>
-                                                        <td class="text-center">{{ pathinfo($doc, PATHINFO_EXTENSION) }}</td>
+                                                        <td>{{ pathinfo($doc['url'], PATHINFO_FILENAME) }}</td>
+                                                        <td class="text-center">{{ pathinfo($doc['url'], PATHINFO_EXTENSION) }}</td>
                                                         <td class="text-center">
-                                                            {{ file_exists($doc) ? round(filesize($doc) / 1024, 2) . ' KB' : 'File not found' }}
+                                                            {{ $doc['size'] }}
                                                         </td>
                                                         <td class="text-center">
-                                                            @if (pathinfo($doc, PATHINFO_EXTENSION) == 'pdf')
-                                                                <a href="{{ $url . $doc }}" target="_blank" style="text-decoration: none; color: grey; font-size: 20px;">
+                                                            @if (pathinfo($doc['url'], PATHINFO_EXTENSION) == 'pdf')
+                                                                <a href="{{ $url . $doc['url'] }}" target="_blank" style="text-decoration: none; color: grey; font-size: 20px;">
                                                                     <i class="fa-solid fa-file-pdf"></i>
                                                                 </a>
                                                             @else
-                                                                <a onclick="openModernModal('{{ $url . $doc }}')" style="text-decoration: none; color: grey; font-size: 20px; cursor: pointer">
+                                                                <a onclick="openModernModal('{{ $url . $doc['url'] }}')" style="text-decoration: none; color: grey; font-size: 20px; cursor: pointer">
                                                                     <i class="fa-solid fa-file-image"></i>
                                                                 </a>
                                                             @endif
@@ -409,6 +412,7 @@
                                                     </tr>
                                                     @php $i++; @endphp
                                                 @endforeach
+                                                @endif
                                             </tbody>
                                         </table>
                                     </div>
