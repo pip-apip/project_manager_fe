@@ -28,7 +28,7 @@
                                 <label>Username <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" placeholder="Masukkan Username" class="form-control @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username', $user ? $user['username'] : '') }}" autocomplete="off" />
+                                <input type="text" placeholder="Masukkan Username" class="form-control @error('user_name') is-invalid @enderror" id="user_name" name="user_name" value="{{ old('user_name', $user ? $user['user_name'] : '') }}" autocomplete="off" />
                                 @error('username')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -48,7 +48,7 @@
                                 <label>Password <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="password" placeholder="Masukkan Password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" autocomplete="off" />
+                                <input type="password" placeholder="Masukkan Password" class="form-control @error('user_password') is-invalid @enderror" id="user_password" name="user_password" autocomplete="off" />
                                 @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

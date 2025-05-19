@@ -91,14 +91,14 @@ class AuthController extends Controller
 
         $request->validate([
             'name'      => 'required|string|max:255',
-            'username'  => 'required|string|max:255',
-            'password'  => 'required|string|min:8',
+            'user_name'  => 'required|string|max:255',
+            'user_password'  => 'required|string|min:8',
         ]);
 
         $response = Http::post('https://bepm.hanatekindo.com/api/v1/auth/register', [
             'name'      => $request['name'],
-            'username'  => $request['username'],
-            'password'  => $request['password'],
+            'username'  => $request['user_name'],
+            'password'  => $request['user_password'],
         ]);
 
         if ($response->successful()) {

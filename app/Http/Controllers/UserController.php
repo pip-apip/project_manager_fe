@@ -155,7 +155,7 @@ class UserController extends Controller
         }
 
         $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'.$id , $data);
-        
+
         if ($response->json()['status'] === 200) {
             return redirect()->route('user.index')->with('success', 'Data User edited successfully.');
         }
