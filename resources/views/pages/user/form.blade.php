@@ -4,6 +4,21 @@
 
 @section('content')
 
+<script>
+    function lookPassword() {
+        const togglePassword = document.querySelector(".password-toggle-icon i");
+        var x = document.getElementById("user_password");
+        if (x.type === "password") {
+            x.type = "text";
+            togglePassword.classList.add("bi-eye-fill");
+            togglePassword.classList.remove("bi-eye-slash");
+        } else {
+            x.type = "password";
+            togglePassword.classList.remove("bi-eye-fill");
+            togglePassword.classList.add("bi-eye-slash");
+        }
+    }
+</script>
 <div class="page-heading">
     <div class="page-content">
         <section id="basic-horizontal-layouts">
@@ -33,23 +48,27 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
+                            <div class="col-md-2">
+                                <label>Password <code>*</code></label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <div class="form-group position-relative has-icon-right">
+                                    <input type="text" class="form-control" placeholder="Masukkan Password" class="form-control @error('user_password') is-invalid @enderror" id="user_password" name="user_password" autocomplete="off" />
+                                    <div class="form-control-icon password-toggle-icon" onclick="lookPassword();">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </div>
+                                </div>
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <hr />
                             <div class="col-md-2">
                                 <label>Nama Lengkap <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
                                 <input type="text" placeholder="Masukkan Nama" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user ? $user['name'] : '') }}" autocomplete="off" />
                                 @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-2">
-                                <label>Password <code>*</code></label>
-                            </div>
-                            <div class="form-group col-md-10">
-                                <input type="password" placeholder="Masukkan Password" class="form-control @error('user_password') is-invalid @enderror" id="user_password" name="user_password" autocomplete="off" />
-                                @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
