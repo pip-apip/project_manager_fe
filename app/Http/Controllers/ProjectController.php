@@ -47,7 +47,7 @@ class ProjectController extends Controller
         ];
 
         if (!empty($q)) {
-            $params[session('user.role') == 'SUPERADMIN' ? 'title' : 'name'] = $q;
+            $params[session('user.role') == 'SUPERADMIN' ? 'name' : 'name'] = $q;
         }
 
         if (!empty($start_date)) {
@@ -62,7 +62,7 @@ class ProjectController extends Controller
             $project_ids = session('user.project_id', []);
             $params['id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
         }
-        
+
         // $startTimeProject = microtime(true);
         $responseProject = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/search', $params);
         // $endTimeProject = microtime(true);
@@ -241,6 +241,8 @@ class ProjectController extends Controller
         $response = Http::withToken($accessToken)->post('https://bepm.hanatekindo.com/api/v1/projects', [
             'name' => $request->input('name'),
             'code' => $request->input('code'),
+            'contract_number' => $request->input('contract_number'),
+            'contract_date' => $request->input('contract_date'),
             'client' => $request->input('client'),
             'ppk' => $request->input('ppk'),
             'support_teams' => $request->input('support_teams'),
@@ -254,6 +256,7 @@ class ProjectController extends Controller
 
         if ($response->json()['status'] !== 201) {
             $errors = $response->json()['errors'];
+            dd($errors);
             return redirect()->back()->withInput()->withErrors($errors);
         }
 
@@ -268,7 +271,7 @@ class ProjectController extends Controller
         // dd($returnAddTeams->getData());
         if ($returnAddTeams->getData()->status == 'error') {
             $errors = $returnAddTeams->json()['message'];
-
+            dd($errors);
             return redirect()->back()->withInput()->withErrors($errors);
         }
 

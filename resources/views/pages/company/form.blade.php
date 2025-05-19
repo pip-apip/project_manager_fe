@@ -122,11 +122,11 @@
                                 @enderror
                             </div>
                             <div class="col-md-2">
-                                <label>No.Telp Direktur <code>*</code></label>
+                                <label>Tanggal Akta Pendirian Perusahaan <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="text" placeholder="Masukkan No.Telp Direktur" class="form-control @error('director_phone') is-invalid @enderror" name="director_phone" id="director_phone" value="{{ old('director_phone', $company ? $company['director_phone'] : '') }}" autocomplete="off" />
-                                @error('director_phone')
+                                <input type="text" placeholder="Masukkan Tanggal Akta Pendirian Perusahaan" class="form-control @error('established_date') is-invalid @enderror" name="established_date" id="established_date" value="{{ old('established_date', $company ? $company['established_date'] : '') }}" autocomplete="off" />
+                                @error('established_date')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

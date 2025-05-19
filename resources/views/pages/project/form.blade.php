@@ -123,6 +123,26 @@
                             </div>
 
                             <div class="col-md-2">
+                                <label>No Surat Perjanjian Kontrak <code>*</code></label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control @error('contract_number') is-invalid @enderror" name="contract_number" value="{{ old('contract_number', $project ? $project['contract_number'] : '') }}" autocomplete="off" placeholder="Masukkan No Surat Perjanjian Kontrak"/>
+                                @error('contract_number')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Tanggal Surat Perjanjian Kontrak <code>*</code></label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="date" class="form-control @error('contract_date') is-invalid @enderror" name="contract_date" value="{{ old('contract_date', $project ? $project['contract_date'] : '') }}" autocomplete="off"/>
+                                @error('contract_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-2">
                                 <label>Klien <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">

@@ -98,13 +98,12 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:100',
-            'address' => 'required|string',
-            'director_name' => 'required|string|max:100',
-            'director_phone' => 'required|string|max:20',
-            'director_signature' => 'sometimes|mimes:jpeg,png,jpg|max:2048'
-        ]);
+        // $request->validate([
+        //     'name' => 'required|string|max:100',
+        //     'address' => 'required|string',
+        //     'director_name' => 'required|string|max:100',
+        //     'director_signature' => 'sometimes|mimes:jpeg,png,jpg|max:2048'
+        // ]);
 
         $accessToken = session('user.access_token');
         $file = $request->file('director_signature');
@@ -114,7 +113,7 @@ class CompanyController extends Controller
             'name' => $request->input('name'),
             'address' => $request->input('address'),
             'director_name' => $request->input('director_name'),
-            'director_phone' => $request->input('director_phone'),
+            'established_date' => $request->input('established_date'),
         ];
 
         if ($file) {
