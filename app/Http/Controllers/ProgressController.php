@@ -214,23 +214,25 @@ class ProgressController extends Controller
         $replacePaths = $request->input('replace_paths');
         $updateIndexes = $request->input('update_indexes');
 
-        foreach ($updateFiles as $i => $file) {
-            $index = $updateIndexes[$i] ?? 'unknown';
-            $oldPath = $replacePaths[$i] ?? null;
+        if (is_array($updateFiles)) {
+            foreach ($updateFiles as $i => $file) {
+                $index = $updateIndexes[$i] ?? 'unknown';
+                $oldPath = $replacePaths[$i] ?? null;
 
-            // $debugData[] = [
-            //     'type' => 'update',
-            //     'index' => $index,
-            //     'original_name' => $file->getClientOriginalName(),
-            //     'replaced_old_path' => $oldPath,
-            // ];
-            $http->attach("replace_images[$index]", $oldPath);
+                // $debugData[] = [
+                //     'type' => 'update',
+                //     'index' => $index,
+                //     'original_name' => $file->getClientOriginalName(),
+                //     'replaced_old_path' => $oldPath,
+                // ];
+                $http->attach("replace_images[$index]", $oldPath);
 
-            $http->attach(
-                "images[$index]",
-                file_get_contents($file->getRealPath()),
-                $file->getClientOriginalName()
-            );
+                $http->attach(
+                    "images[$index]",
+                    file_get_contents($file->getRealPath()),
+                    $file->getClientOriginalName()
+                );
+            }
         }
 
         // 3. Debug deleted files

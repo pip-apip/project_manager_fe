@@ -372,6 +372,7 @@
     }
 
     function updateImage(id){
+        buttonLoadingStart("save-button");
         const formData = new FormData();
 
         // New files
@@ -410,6 +411,7 @@
             contentType: false,
             success: function(response) {
                 console.log('Upload successful:', response);
+                buttonLoadingEnd("save-button");
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',

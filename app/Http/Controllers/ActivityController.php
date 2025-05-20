@@ -329,6 +329,7 @@ class ActivityController extends Controller
     public function updateDoc(Request $request, string $id)
     {
         $accessToken = session('user.access_token');
+        // $debugData = [];
 
         $http = Http::withToken($accessToken);
 
@@ -340,6 +341,12 @@ class ActivityController extends Controller
         // 1. Debug file baru
         if ($request->hasFile('new_files')) {
             foreach ($request->file('new_files') as $index => $file) {
+                // $debugData[] = [
+                //     'type' => 'new',
+                //     'original_name' => $file->getClientOriginalName(),
+                //     'size_kb' => round($file->getSize() / 1024, 2),
+                //     'mime_type' => $file->getMimeType(),
+                // ];
                 $http->attach(
                     "files[$index]",
                     file_get_contents($file->getRealPath()),
@@ -353,22 +360,35 @@ class ActivityController extends Controller
         $replacePaths = $request->input('replace_paths');
         $updateIndexes = $request->input('update_indexes');
 
-        foreach ($updateFiles as $i => $file) {
-            $index = $updateIndexes[$i] ?? 'unknown';
-            $oldPath = $replacePaths[$i] ?? null;
+        if (is_array($updateFiles)) {
+            foreach ($updateFiles as $i => $file) {
+                $index = $updateIndexes[$i] ?? 'unknown';
+                $oldPath = $replacePaths[$i] ?? null;
 
-            $http->attach("replace_files[$index]", $oldPath);
+                // $debugData[] = [
+                //     'type' => 'update',
+                //     'index' => $index,
+                //     'original_name' => $file->getClientOriginalName(),
+                //     'replaced_old_path' => $oldPath,
+                // ];
 
-            $http->attach(
-                "files[$index]",
-                file_get_contents($file->getRealPath()),
-                $file->getClientOriginalName()
-            );
+                $http->attach("replace_files[$index]", $oldPath);
+
+                $http->attach(
+                    "files[$index]",
+                    file_get_contents($file->getRealPath()),
+                    $file->getClientOriginalName()
+                );
+            }
         }
 
         // 3. Debug deleted files
         if ($request->has('remove_files')) {
             foreach ($request->input('remove_files') as $index => $path) {
+                // $debugData[] = [
+                //     'type' => 'deleted',
+                //     'deleted_path' => $path,
+                // ];
                 $http->attach("remove_files[$index]", $path);
             }
         }
