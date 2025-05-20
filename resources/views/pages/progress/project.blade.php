@@ -5,6 +5,18 @@
 @section('content')
 
 <style>
+    tr.deleted td {
+        text-decoration: line-through;
+        color: #a0a0a0;
+        background-color: #f9d6d5;
+    }
+
+    tr.edited td {
+        text-decoration: line-through;
+        color: #a0a0a0;
+        background-color: #f9d6d5;
+    }
+
     /* File Upload */
     .file-upload-wrapper {
         background-color: #f4f3f2;
@@ -87,7 +99,9 @@
         margin-left: 6px;
     }
 
-    .remove-file {
+    .remove-file,
+    .remove-edited-file,
+    .remove-new-file {
         background-color: #e74c3c;
         color: white;
         border-radius: 50%;
@@ -99,7 +113,9 @@
         transition: background-color 0.2s;
     }
 
-    .remove-file:hover {
+    .remove-file,
+    .remove-new-file,
+    .remove-edited-file:hover {
         background-color: #c0392b;
     }
 
@@ -146,40 +162,49 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-sm-12">
-                            <table class="table table-striped" id="table">
-                                <thead>
-                                    <tr>
-                                        <th>Spec Tech</th>
-                                        <th width="15%" class="text-center">Progress</th>
-                                        <th width="15%" class="text-center">Keterangan</th>
-                                        <th width="5%" class="text-center">Gambar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($activityCategory as $cat)
+                        <form action="{{ route('progress.store', $project['id']) }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="col-sm-12">
+                                <table class="table table-striped" id="table">
+                                    <thead>
                                         <tr>
-                                            <td>{{ $cat['name'] }}</td>
-                                            <td class="text-center">
-                                                <div class="d-flex align-items-center">
-                                                    <input type="text" class="form-control text-center" id="progress_{{ $cat['id'] }}" name="progress_{{ $cat['id'] }}" value="0">
-                                                    <span class="ms-2">%</span>
-                                                </div>
-                                            </td>
-                                            <td width="15%">
-                                                <textarea class="form-control" id="exampleFormControlTextarea1" rows="2"></textarea>
-                                            </td>
-                                            <td width="5%" class="text-center">
-                                                <a href="http://" class="btn btn-sm btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#detailModal"><i class="fa-solid fa-image"></i></a>
-                                            </td>
+                                            <th>Spec Tech</th>
+                                            <th width="15%" class="text-center">Progress</th>
+                                            <th width="15%" class="text-center">Keterangan</th>
+                                            <th width="5%" class="text-center">Gambar</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-sm-12 d-flex justify-content-end mt-3">
-                            <button type="submit" class="btn btn-primary me-1 mb-1" id="submitButtonPage1">Simpan</button>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        @if (count($activityCategory) == 0)
+                                            <tr>
+                                                <td colspan="4" class="text-center">Tidak ada data</td>
+                                            </tr>
+                                        @else
+                                        @foreach ($activityCategory as $cat)
+                                            <tr>
+                                                <td>{{ $cat['name'] }}</td>
+                                                <td class="text-center">
+                                                    <div class="d-flex align-items-center">
+                                                        <input type="text" class="form-control text-center" id="progress_{{ $cat['id'] }}" name="progress_{{ $cat['id'] }}" value="{{ $cat['value'] ?? '0' }}" autocomplete="off">
+                                                        <span class="ms-2">%</span>
+                                                    </div>
+                                                </td>
+                                                <td width="15%">
+                                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="2" name="note_{{ $cat['id'] }}" placeholder="Masukkan Keterangan">{{ $cat['note'] ?? '' }}</textarea>
+                                                </td>
+                                                <td width="5%" class="text-center">
+                                                    <button type="button" onclick="showDetail({{ $cat['id'] }})" class="btn btn-sm btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#detailModal"><i class="fa-solid fa-image"></i></button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-sm-12 d-flex justify-content-end mt-3">
+                                <button type="submit" class="btn btn-primary me-1 mb-1" id="submitButtonPage1">Simpan</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -188,8 +213,8 @@
 </div>
 
 <div class="modal fade text-left w-100" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel33"
-    aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+    data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="myModalLabel33">Progress Image</h4>
@@ -199,8 +224,27 @@
             </div>
             <div>
                 <div class="modal-body">
+                    <input type="text" id="activity_id" style="display: none">
                     <div class="row">
-                        <div class="col-sm-12" id="form-content">
+                        <div class="col-sm-12" id="show-content">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th class="text-center">Preview</th>
+                                        <th class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="images-list">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-12" id="form-content" style="display: none">
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label>Antrian Upload Gambar</label>
+                            </div>
                             <div class="file-upload-wrapper" id="dropzone">
                                 <label for="file-upload" class="file-upload-area @error('file') is-invalid @enderror">
                                     <div class="upload-text" id="upload-text">
@@ -217,27 +261,14 @@
                             </small>
                             @enderror
                         </div>
-                        <div class="col-sm-12" id="show-content" style="display: none;">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Tanggal Upload</th>
-                                        <th class="text-center">File</th>
-                                        <th class="text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="file-list">
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a class="btn btn-warning ml-1" id="editButton" style="display: none;">
-                        <i class="fa-solid fa-pen"></i> Edit
-                    </a>
-                    <button type="button" class="btn btn-danger ml-1" id="saveButton">
+                    <button type="button" class="btn btn-danger ml-1" id="save-button" style="display: none" onclick="saveImage()">
                         <i class="fa-solid fa-floppy-disk"></i> Simpan
+                    </button>
+                    <button type="button" class="btn btn-success ml-1" id="addButton">
+                        <i class="fa-solid fa-plus"></i> Tambah Dokumen
                     </button>
                 </div>
             </div>
@@ -248,102 +279,317 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-    let status;
-    document.addEventListener("DOMContentLoaded", function () {
-        status = "show";
-        showContent();
-    });
+    let idActivityOpened = null;
+    let images = [];
+    let selectedFiles = [];
+    const updateFiles = [];
+    const replacePaths = [];
+    const deletePaths = [];
+    const activities = @json($activityCategory);
+    let activity = null;
 
-    $('#editButton').on('click', function() {
-        status = "form";
-        showContent();
-    });
+    function showDetail(id) {
+        idActivityOpened = id;
+        $('#activity_id').val(id);
+        activity = activities.find(activity => activity.id === id);
 
-    function showContent() {
-        if (status === "form") {
-            $('#form-content').show();
-            $('#editButton').hide();
-            $('#show-content').hide();
-            $('#saveButton').show();
+        let path = "https://bepm.hanatekindo.com/storage/"
+        images = activity.images || [];
+
+        let html = '';
+        if (activity.images.length > 0) {
+            activity.images.forEach((image, key) => {
+                let fileName = image.split('/').pop();
+                html += `
+                    <tr>
+                        <td>${fileName}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-info btn-sm" onclick="window.open('${path}${image}', '_blank')">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-warning btn-sm" onclick="editImage(${key}, '${image}')">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteImage(${key}, '${image}')">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
         } else {
-            $('#form-content').hide();
-            $('#editButton').show();
-            $('#show-content').show();
-            $('#saveButton').hide();
+            html = `
+                <tr>
+                    <td colspan="3" class="text-center">Tidak ada data</td>
+                </tr>
+            `;
         }
+        $('#images-list').html(html);
+    }
+
+    function editImage(index, path) {
+        console.log('Edit image at index:', index);
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+
+        input.onchange = function () {
+            const newFile = input.files[0];
+            if (newFile) {
+                updateFiles[index] = newFile;
+                replacePaths[index] = path;
+                handleFiles();
+
+                const row = $(`#images-list tr:eq(${index})`);
+                if (!row.hasClass('deleted')) {
+                    row.addClass('edited');
+                }
+
+                row.find('button').prop('disabled', true);
+            }
+        };
+
+        input.click();
+    }
+
+    function deleteImage(index, path) {
+        console.log('Delete image at index:', index);
+
+        // Tambahkan ke list file yang akan dihapus
+        deletePaths.push(path);
+
+        // Jika file ini sebelumnya diedit, batalkan edit-nya
+        delete updateFiles[index];
+        delete replacePaths[index];
+
+        const row = $(`#images-list tr:eq(${index})`);
+        row.addClass('deleted');
+        row.find('button').prop('disabled', true);
+
+        handleFiles();
+    }
+
+    function updateImage(id){
+        const formData = new FormData();
+
+        // New files
+        selectedFiles.forEach(file => {
+            formData.append('new_files[]', file);
+        });
+
+        // Edited files + path yang diganti
+        updateFiles.forEach((file, index) => {
+            if (file) {
+                formData.append('update_files[]', file);
+                formData.append('replace_paths[]', replacePaths[index] || '');
+                formData.append('update_indexes[]', index); // Kirim index juga
+            }
+        });
+
+        // Deleted files
+        deletePaths.forEach(path => {
+            formData.append('remove_images[]', path);
+        });
+
+        formData.append('_token', '{{ csrf_token() }}');
+
+        // Debug
+        console.log({
+            new_files: selectedFiles,
+            update: updateFiles,
+            delete: deletePaths
+        });
+
+        $.ajax({
+            url: `{{ route('progress.updateImage', ':id') }}`.replace(':id', idActivityOpened),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                console.log('Upload successful:', response);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Images uploaded successfully.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload();
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Upload failed:', error);
+                alert('Failed to upload files. Please try again.');
+            }
+        });
+    }
+
+    function saveImage() {
+        let formData = new FormData();
+        selectedFiles.forEach((file) => {
+            formData.append('files[]', file);
+        });
+        formData.append('_token', '{{ csrf_token() }}');
+
+        $.ajax({
+            url: `{{ route('progress.storeImage', ':id') }}`.replace(':id', idActivityOpened),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                console.log('Upload successful:', response);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Images uploaded successfully.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload();
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Upload failed:', error);
+                alert('Failed to upload files. Please try again.');
+            }
+        });
     }
 </script>
 
 {{-- File Upload Script --}}
 <script>
-    let selectedFiles = [];
-    const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('file-upload');
-    const uploadText = document.getElementById('upload-text');
-    const filePreview = document.getElementById('file-preview');
+    const fileInput = $('#file-upload');
+    const uploadText = $('#upload-text');
+    const filePreview = $('#file-preview');
+    const dropzone = $('#dropzone');
+    const addButton = $('#addButton');
 
-
-    dropzone.addEventListener('dragover', function(e) {
+    dropzone.on('dragover', function(e) {
         e.preventDefault();
-        dropzone.classList.add('dragover');
+        $(this).addClass('dragover');
     });
 
-    dropzone.addEventListener('dragleave', function(e) {
+    dropzone.on('dragleave', function(e) {
         e.preventDefault();
-        dropzone.classList.remove('dragover');
+        $(this).removeClass('dragover');
     });
 
-    dropzone.addEventListener('drop', function(e) {
+    dropzone.on('drop', function(e) {
         e.preventDefault();
-        dropzone.classList.remove('dragover');
-        const files = Array.from(e.dataTransfer.files);
+        $(this).removeClass('dragover');
+        const files = Array.from(e.originalEvent.dataTransfer.files);
         selectedFiles = selectedFiles.concat(files);
         handleFiles();
     });
 
-    fileInput.addEventListener('change', function() {
-        const files = Array.from(fileInput.files);
+    fileInput.on('change', function() {
+        const files = Array.from(this.files);
         selectedFiles = selectedFiles.concat(files);
         handleFiles();
+    });
+
+    addButton.on('click', function() {
+        fileInput.click();
     });
 
     function handleFiles() {
-        if (selectedFiles.length > 0) {
-            renderFilePreview();
+        const hasNewFiles = selectedFiles.length > 0;
+        const hasEditedFiles = updateFiles.some(file => file !== undefined);
+        const hasDeletedFiles = deletePaths.length > 0;
+
+        // Tampilkan file preview hanya jika ada file baru atau yang diedit
+        if (hasNewFiles || hasEditedFiles) {
+            renderFilePreview();      // Fungsi untuk menampilkan preview file
+            filePreview.show();
+            uploadText.hide();
         } else {
-            filePreview.style.display = 'none';
-            uploadText.style.display = 'block';
+            filePreview.hide();
+            uploadText.show();
+        }
+
+        // Tampilkan form jika ada perubahan apa pun (new/edit/delete)
+        if (hasNewFiles || hasEditedFiles || hasDeletedFiles) {
+            if (hasNewFiles || hasEditedFiles) {
+                $('#form-content').show();
+            } else {
+                $('#form-content').hide();
+            }
+
+            const hasExistingImages = activity && activity.images && activity.images.length > 0;
+
+            if (hasExistingImages || hasDeletedFiles) {
+                $('#save-button').attr('onclick', 'updateImage()').show();
+            } else {
+                $('#save-button').attr('onclick', 'saveImage()').show();
+            }
+        } else {
+            $('#form-content').hide();
+            $('#save-button').hide();
         }
     }
 
     function renderFilePreview() {
-        filePreview.innerHTML = '';
+        filePreview.empty();
 
-        selectedFiles.forEach((file, index) => {
-            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-            const fileItem = document.createElement('div');
-            fileItem.className = 'file-item';
-            fileItem.innerHTML = `
-                <div class="file-name">${file.name}<span class="file-size"> (${sizeMB} MB)</span></div>
-                <span class="remove-file" data-index="${index}">&times;</span>
-            `;
-            filePreview.appendChild(fileItem);
+        // 1. Tampilkan file hasil edit (updateFiles)
+        updateFiles.forEach((file, index) => {
+            if (file) {
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                const oldPath = replacePaths[index] || 'Unknown path';
+                const fileItem = $(`
+                    <div class="file-item new">
+                        <div class="file-name">${file.name} <span class="file-size">(${sizeMB} MB, edited)</span><br>
+                            <small>Replacing: ${oldPath}</small>
+                        </div>
+                        <span class="remove-edited-file" data-index="${index}">&times;</span>
+                    </div>
+                `);
+                filePreview.append(fileItem);
+            }
         });
 
-        filePreview.style.display = 'flex';
-        uploadText.style.display = 'none';
+        // 2. Tampilkan file baru (selectedFiles)
+        selectedFiles.forEach((file, index) => {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            const fileItem = $(`
+                <div class="file-item new">
+                    <div class="file-name">${file.name} <span class="file-size">(${sizeMB} MB)</span></div>
+                    <span class="remove-new-file" data-index="${index}">&times;</span>
+                </div>
+            `);
+            filePreview.append(fileItem);
+        });
+
+        // 3. Tampilkan preview hanya jika ada file baru atau edit
+        const hasPreview = selectedFiles.length > 0 || updateFiles.some(f => f !== undefined);
+        if (hasPreview) {
+            filePreview.css('display', 'flex');
+            uploadText.hide();
+        } else {
+            filePreview.hide();
+            uploadText.show();
+        }
     }
 
-    filePreview.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-file')) {
-            const index = e.target.getAttribute('data-index');
-            selectedFiles.splice(index, 1);
-            handleFiles();
 
-            document.querySelectorAll('.file-error-message').forEach(el => el.remove());
-            filePreview.classList.remove('is-invalid');
-        }
+
+    filePreview.on('click', '.remove-edited-file', function () {
+        const index = $(this).data('index');
+        delete updateFiles[index];
+        delete replacePaths[index];
+        handleFiles();
     });
+
+    filePreview.on('click', '.remove-new-file', function () {
+        const index = $(this).data('index');
+        selectedFiles.splice(index, 1);
+        handleFiles();
+    });
+
 </script>
 
 @endsection

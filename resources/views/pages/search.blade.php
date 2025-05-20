@@ -312,11 +312,22 @@
     }
 
     function dateFormat(dateTimeString) {
-        let datePart = dateTimeString.split(" ")[0];
+        if (!dateTimeString || typeof dateTimeString !== "string") {
+            return "Invalid Date";
+        }
 
+        let datePart = dateTimeString.split(" ")[0];
         let [year, month, day] = datePart.split("-");
 
+        if (!year || !month || !day) {
+            return "Invalid Date";
+        }
+
         let date = new Date(year, month - 1, day);
+
+        if (isNaN(date.getTime())) {
+            return "Invalid Date";
+        }
 
         let formattedDate = new Intl.DateTimeFormat("id-ID", {
             day: "2-digit",

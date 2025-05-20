@@ -109,6 +109,7 @@ Route::middleware([AuthMiddleware::class, RefershTokenMiddleware::class])->group
 
     Route::get('activity/doc/{id}', [ActivityController::class, 'show'])->name('activity.doc');
     Route::post('activity/doc/store', [ActivityController::class, 'storeDoc'])->name('activity.doc.store');
+    Route::post('activity/doc/update/{id}', [ActivityController::class, 'updateDoc'])->name('activity.doc.update');
     Route::get('activity/doc/delete/{id}', [ActivityController::class, 'destroyDoc'])->name('activity.doc.delete');
 
     Route::post('activity/filter', [ActivityController::class, 'filter'])->name('activity.filter');
@@ -130,6 +131,9 @@ Route::middleware([AuthMiddleware::class, RefershTokenMiddleware::class])->group
     // Progress
     Route::get('progress', [ProgressController::class, 'index'])->name('progress.index');
     Route::get('progress/project/{id}', [ProgressController::class, 'show'])->name('progress.project');
+    Route::post('progress/project/{id}/save', [ProgressController::class, 'store'])->name('progress.store');
+    Route::post('/progress/project/saveImage/{id}', [ProgressController::class, 'storeImage'])->name('progress.storeImage');
+    Route::post('/progress/project/updateImage/{id}', [ProgressController::class, 'updateImage'])->name('progress.updateImage');
     // Route::get('/activity-project/{id}', [ActivityController::class, 'activity_project'])->name('activity.project');
 });
 

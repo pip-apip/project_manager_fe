@@ -91,6 +91,17 @@
     }
 
     /* File Upload */
+    tr.deleted td {
+        text-decoration: line-through;
+        color: #a0a0a0;
+        background-color: #f9d6d5;
+    }
+
+    tr.edited td {
+        text-decoration: line-through;
+        color: #a0a0a0;
+        background-color: #f9d6d5;
+    }
     .file-upload-wrapper {
         background-color: #f4f3f2;
         padding: 16px;
@@ -172,7 +183,8 @@
         margin-left: 6px;
     }
 
-    .remove-file {
+    .remove-new-file,
+    .remove-edited-file {
         background-color: #e74c3c;
         color: white;
         border-radius: 50%;
@@ -184,7 +196,8 @@
         transition: background-color 0.2s;
     }
 
-    .remove-file:hover {
+    .remove-new-file:hover,
+    .remove-edited-file:hover {
         background-color: #c0392b;
     }
 
@@ -330,7 +343,11 @@
                                     <div class="col-md-2">
                                         <label>Berkas Dokumentasi</label>
                                     </div>
-                                    <div class="col-md-10">
+                                    <div class="col-md-10 row" id="table-document" style="display: none">
+
+                                    </div>
+                                    {{-- <div class="col-md-10 offset-md-2" id="dropzone-container"> --}}
+                                    <div class="col-md-10" id="dropzone-container" style="display: none">
                                         <div class="file-upload-wrapper" id="dropzone">
                                             <label for="file-upload" class="file-upload-area @error('file') is-invalid @enderror">
                                                 <div class="upload-text" id="upload-text">
@@ -502,84 +519,44 @@
             toolbar: [
                 ['bold', 'italic', 'underline', 'strike'],
                 ['blockquote', 'code-block'],
-                [{
-                    'list': 'ordered'
-                }, {
-                    'list': 'bullet'
-                }],
-                [{
-                    'script': 'sub'
-                }, {
-                    'script': 'super'
-                }],
-                [{
-                    'indent': '-1'
-                }, {
-                    'indent': '+1'
-                }],
-                [{
-                    'direction': 'rtl'
-                }],
-                [{
-                    'size': ['small', false, 'large', 'huge']
-                }],
-                [{
-                    'header': [1, 2, 3, false]
-                }],
-                [{
-                    'color': []
-                }, {
-                    'background': []
-                }],
-                [{
-                    'font': []
-                }],
-                [{
-                    'align': []
-                }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'header': [1, 2, 3, false] }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'font': [] }],
+                [{ 'align': [] }],
                 ['clean']
             ]
         }
     });
 
-    // console.log({!! json_encode(session()->get('lastRoute')) !!});
     let tags = [];
 
     function renderTags() {
-        let tagContainer = $("#tags");
-        tagContainer.find(".tag").remove();
-
-        if (tags.length === 0) return;
-
-        tags.forEach((tag, index) => {
-            let tagElement = $(`
-                <div class="tag">
-                    ${tag}
-                    <span class="remove" data-index="${index}">&times;</span>
-                </div>
-            `);
-            tagContainer.append(tagElement);
+        const tagContainer = $("#tags").empty();
+        tags.forEach((tag, i) => {
+            tagContainer.append(`
+                <div class="tag">${tag}
+                    <span class="remove" data-index="${i}">&times;</span>
+                </div>`);
         });
     }
 
-    $(document).on("keydown", "#tagInput", function (event) {
-        if (event.key === "Enter" && this.value.trim() !== "") {
-            event.preventDefault();
-
-            let tagText = this.value.trim().toLowerCase();
-
-            if (!tags.includes(tagText)) {
-                tags.push(tagText);
-                renderTags();
-            }
-
+    $(document).on("keydown", "#tagInput", function (e) {
+        if (e.key === "Enter" && this.value.trim() !== "") {
+            e.preventDefault();
+            const tagText = this.value.trim().toLowerCase();
+            if (!tags.includes(tagText)) tags.push(tagText);
+            renderTags();
             this.value = "";
         }
     });
 
     $(document).on("click", ".remove", function () {
-        let index = $(this).data("index");
-        tags.splice(index, 1);
+        tags.splice($(this).data("index"), 1);
         renderTags();
     });
 </script>
@@ -655,23 +632,186 @@
         $('#category_id').val(docData.activity_doc_category_id);
 
         quill.clipboard.dangerouslyPasteHTML(docData.description);
-        console.log(docData.description);
 
         tags = docData.tags || [];
         renderTags();
 
-        selectedFiles = [];
-        document.getElementById('file-upload').value = "";
-        document.getElementById('file-preview').style.display = 'none';
-        document.getElementById('upload-text').style.display = 'block';
+        let path = "https://bepm.hanatekindo.com/storage/"
+        let html = '';
+        let html_file_list = '';
+        if (docData.files.length > 0) {
+            html +=`
+                <div class="col-md-11">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th class="text-center">Preview</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="file-list">
+
+                    </tbody>
+                </table>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-primary btn-sm" id="addButton"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            `;
+            docData.files.forEach((file, key) => {
+                // console.log(file)
+                let fileName = file.url.split('/').pop();
+                html_file_list += `
+                    <tr>
+                        <td>${fileName}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-info btn-sm" onclick="window.open('${path}${file.url}', '_blank')">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-warning btn-sm" onclick="editFile(${key}, '${file.url}')">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteFile(${key}, '${file.url}')">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        } else {
+            html = `
+                <tr>
+                    <td colspan="3" class="text-center">Tidak ada data</td>
+                </tr>
+            `;
+        }
+        $('#table-document').html(html).show();
+        $('#file-list').html(html_file_list);
+        $('#dropzone-container').attr('class', 'offset-md-2 col-md-10').hide();
 
         $('#submitButton').text('Perbarui').attr('onclick', 'updateDoc()');
+    }
+
+    function editFile(index, path) {
+        console.log('Edit file at index:', index);
+        const input = document.createElement('input');
+        input.type = 'file';
+
+        input.onchange = function () {
+            const newFile = input.files[0];
+            if (newFile) {
+                updateFiles[index] = newFile;
+                replacePaths[index] = path;
+                handleFiles();
+
+                const row = $(`#file-list tr:eq(${index})`);
+                if (!row.hasClass('deleted')) {
+                    row.addClass('edited');
+                }
+
+                row.find('button').prop('disabled', true);
+            }
+        };
+
+        input.click();
+    }
+
+    function deleteFile(index, path) {
+        console.log('Delete file at index:', index);
+
+        // Tambahkan ke list file yang akan dihapus
+        deletePaths.push(path);
+
+        // Jika file ini sebelumnya diedit, batalkan edit-nya
+        delete updateFiles[index];
+        delete replacePaths[index];
+
+        const row = $(`#file-list tr:eq(${index})`);
+        row.addClass('deleted');
+        row.find('button').prop('disabled', true);
+
+        handleFiles();
     }
 
     function cancelEdit() {
         $('#actionButton').attr('onclick', 'editDoc()').attr('class', 'btn btn-warning btn-sm').html('<i class="fa-solid fa-pen"></i>');
         $('#show_MOM').show();
         $('#form_MOM').hide();
+    }
+
+    function updateDoc() {
+        const formData = new FormData(document.getElementById("form"));
+        formData.append('description', quill.root.innerHTML);
+        formData.append('tags', JSON.stringify(tags));
+
+        // New files
+        selectedFiles.forEach(file => {
+            formData.append('new_files[]', file);
+        });
+
+        // Edited files + path yang diganti
+        updateFiles.forEach((file, index) => {
+            if (file) {
+                formData.append('update_files[]', file);
+                formData.append('replace_paths[]', replacePaths[index] || '');
+                formData.append('update_indexes[]', index);
+            }
+        });
+
+        // Deleted files
+        deletePaths.forEach(path => {
+            formData.append('remove_files[]', path);
+        });
+
+        formData.append('_token', '{{ csrf_token() }}');
+
+        // Debug
+        console.log({
+            new_files: selectedFiles,
+            update: updateFiles,
+            delete: deletePaths
+        });
+
+        $.ajax({
+            url: `{{ route('activity.doc.update', ':id') }}`.replace(':id', doc[0].id),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log('response',response);
+                if(response.status === 400 || response.status === 500){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }else{
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Upload failed:', error);
+                alert('Failed to upload files. Please try again.');
+            }
+        });
+
+        // [...formData.entries()].forEach(([key, value]) => {
+        //     console.log(key, value);
+        // });
     }
 
     function storeDoc() {
@@ -786,72 +926,125 @@
 {{-- File Upload Script --}}
 <script>
     let selectedFiles = [];
-    const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('file-upload');
-    const uploadText = document.getElementById('upload-text');
-    const filePreview = document.getElementById('file-preview');
+    const updateFiles = [];
+    const replacePaths = [];
+    const deletePaths = [];
+    const dropzone = $('#dropzone');
+    const fileInput = $('#file-upload');
+    const uploadText = $('#upload-text');
+    const filePreview = $('#file-preview');
+    const addButton = $('#addButton');
 
-
-    dropzone.addEventListener('dragover', function(e) {
+    dropzone.on('dragover', function(e) {
         e.preventDefault();
-        dropzone.classList.add('dragover');
+        dropzone.addClass('dragover');
     });
 
-    dropzone.addEventListener('dragleave', function(e) {
+    dropzone.on('dragleave', function(e) {
         e.preventDefault();
-        dropzone.classList.remove('dragover');
+        dropzone.removeClass('dragover');
     });
 
-    dropzone.addEventListener('drop', function(e) {
+    dropzone.on('drop', function(e) {
         e.preventDefault();
-        dropzone.classList.remove('dragover');
-        const files = Array.from(e.dataTransfer.files);
+        dropzone.removeClass('dragover');
+        const files = Array.from(e.originalEvent.dataTransfer.files);
         selectedFiles = selectedFiles.concat(files);
         handleFiles();
     });
 
-    fileInput.addEventListener('change', function() {
-        const files = Array.from(fileInput.files);
+    fileInput.on('change', function() {
+        const files = Array.from(fileInput[0].files);
         selectedFiles = selectedFiles.concat(files);
         handleFiles();
+    });
+
+    $(document).on('click', '#addButton', function () {
+        $('#file-upload').click();
     });
 
     function handleFiles() {
-        if (selectedFiles.length > 0) {
-            renderFilePreview();
+        const hasNewFiles = selectedFiles.length > 0;
+        const hasEditedFiles = updateFiles.some(file => file !== undefined);
+        const hasDeletedFiles = deletePaths.length > 0;
+
+        // Tampilkan file preview hanya jika ada file baru atau yang diedit
+        if (hasNewFiles || hasEditedFiles) {
+            renderFilePreview();      // Fungsi untuk menampilkan preview file
+            filePreview.show();
+            uploadText.hide();
         } else {
-            filePreview.style.display = 'none';
-            uploadText.style.display = 'block';
+            filePreview.hide();
+            uploadText.show();
+        }
+
+        // Tampilkan form jika ada perubahan apa pun (new/edit/delete)
+        if (hasNewFiles || hasEditedFiles || hasDeletedFiles) {
+            if (hasNewFiles || hasEditedFiles) {
+                $('#dropzone-container').show();
+            } else {
+                $('#dropzone-container').hide();
+            }
+        } else {
+            $('#dropzone-container').hide();
+            $('#save-button').hide();
         }
     }
 
     function renderFilePreview() {
-        filePreview.innerHTML = '';
+        filePreview.empty();
 
-        selectedFiles.forEach((file, index) => {
-            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-            const fileItem = document.createElement('div');
-            fileItem.className = 'file-item';
-            fileItem.innerHTML = `
-                <div class="file-name">${file.name}<span class="file-size"> (${sizeMB} MB)</span></div>
-                <span class="remove-file" data-index="${index}">&times;</span>
-            `;
-            filePreview.appendChild(fileItem);
+        // 1. Tampilkan file hasil edit (updateFiles)
+        updateFiles.forEach((file, index) => {
+            if (file) {
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                const oldPath = replacePaths[index] || 'Unknown path';
+                const fileItem = $(`
+                    <div class="file-item new">
+                        <div class="file-name">${file.name} <span class="file-size">(${sizeMB} MB, edited)</span><br>
+                            <small>Replacing: ${oldPath}</small>
+                        </div>
+                        <span class="remove-edited-file" data-index="${index}">&times;</span>
+                    </div>
+                `);
+                filePreview.append(fileItem);
+            }
         });
 
-        filePreview.style.display = 'flex';
-        uploadText.style.display = 'none';
+        // 2. Tampilkan file baru (selectedFiles)
+        selectedFiles.forEach((file, index) => {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            const fileItem = $(`
+                <div class="file-item new">
+                    <div class="file-name">${file.name} <span class="file-size">(${sizeMB} MB)</span></div>
+                    <span class="remove-new-file" data-index="${index}">&times;</span>
+                </div>
+            `);
+            filePreview.append(fileItem);
+        });
+
+        // 3. Tampilkan preview hanya jika ada file baru atau edit
+        const hasPreview = selectedFiles.length > 0 || updateFiles.some(f => f !== undefined);
+        if (hasPreview) {
+            filePreview.css('display', 'flex');
+            uploadText.hide();
+        } else {
+            filePreview.hide();
+            uploadText.show();
+        }
     }
 
-    filePreview.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-file')) {
-            const index = e.target.getAttribute('data-index');
-            selectedFiles.splice(index, 1);
-            handleFiles();
+    filePreview.on('click', '.remove-edited-file', function () {
+        const index = $(this).data('index');
+        delete updateFiles[index];
+        delete replacePaths[index];
+        handleFiles();
+    });
 
-            document.querySelectorAll('.file-error-message').forEach(el => el.remove());
-            filePreview.classList.remove('is-invalid');
-        }
+    filePreview.on('click', '.remove-new-file', function () {
+        const index = $(this).data('index');
+        selectedFiles.splice(index, 1);
+        handleFiles();
     });
 </script>
 
