@@ -567,6 +567,11 @@
     document.addEventListener("DOMContentLoaded", function () {
         let selectedValue = $('#documentCat2').val() ?? $('#documentCat1').val();
         showCardDoc(selectedValue);
+        if(doc){
+            $('#dropzone-container').show();
+        }else{
+            $('#dropzone-container').hide();
+        }
     });
 
     $("#documentCat1, #documentCat2").change(async function () {
@@ -743,6 +748,7 @@
     }
 
     function updateDoc() {
+        buttonLoadingStart("submitButton");
         const formData = new FormData(document.getElementById("form"));
         formData.append('description', quill.root.innerHTML);
         formData.append('tags', JSON.stringify(tags));
@@ -769,11 +775,11 @@
         formData.append('_token', '{{ csrf_token() }}');
 
         // Debug
-        console.log({
-            new_files: selectedFiles,
-            update: updateFiles,
-            delete: deletePaths
-        });
+        // console.log({
+        //     new_files: selectedFiles,
+        //     update: updateFiles,
+        //     delete: deletePaths
+        // });
 
         $.ajax({
             url: `{{ route('activity.doc.update', ':id') }}`.replace(':id', doc[0].id),
@@ -783,6 +789,7 @@
             contentType: false,
             success: function (response) {
                 console.log('response',response);
+                buttonLoadingEnd("submitButton");
                 if(response.status === 400 || response.status === 500){
                     Swal.fire({
                         icon: 'error',
@@ -804,6 +811,7 @@
                 }
             },
             error: function (xhr, status, error) {
+                buttonLoadingEnd("submitButton");
                 console.error('Upload failed:', error);
                 alert('Failed to upload files. Please try again.');
             }
