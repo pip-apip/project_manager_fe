@@ -63,7 +63,7 @@
                             <tbody id="table_body">
                             @if(is_object($results) && method_exists($results, 'firstItem'))
                                 @foreach ($results as $project)
-                                    @if(isset($project['progress']) && is_object($project['progress']))
+                                    @if(isset($project['progress']))
                                     @php
                                         $status = '<span class="badge ' . ($project['progress'] ? 'bg-success' : 'bg-danger') . '">'
                                         . $project['progress'] . '%</span>';

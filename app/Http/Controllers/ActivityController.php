@@ -322,6 +322,76 @@ class ActivityController extends Controller
         ]);
     }
 
+    /**
+     * Update a document.
+     */
+
+    public function updateDoc(Request $request, string $id)
+    {
+        $accessToken = session('user.access_token');
+
+        $http = Http::withToken($accessToken);
+
+        // Attach text fields
+        $http->attach('title', $request->input('title'))
+            ->attach('description', $request->input('description'))
+            ->attach('tags', $request->input('tags'));
+
+        // 1. Debug file baru
+        if ($request->hasFile('new_files')) {
+            foreach ($request->file('new_files') as $index => $file) {
+                $http->attach(
+                    "files[$index]",
+                    file_get_contents($file->getRealPath()),
+                    $file->getClientOriginalName()
+                );
+            }
+        }
+
+        // 2. Debug file update dan path lama
+        $updateFiles = $request->file('update_files');
+        $replacePaths = $request->input('replace_paths');
+        $updateIndexes = $request->input('update_indexes');
+
+        foreach ($updateFiles as $i => $file) {
+            $index = $updateIndexes[$i] ?? 'unknown';
+            $oldPath = $replacePaths[$i] ?? null;
+
+            $http->attach("replace_files[$index]", $oldPath);
+
+            $http->attach(
+                "files[$index]",
+                file_get_contents($file->getRealPath()),
+                $file->getClientOriginalName()
+            );
+        }
+
+        // 3. Debug deleted files
+        if ($request->has('remove_files')) {
+            foreach ($request->input('remove_files') as $index => $path) {
+                $http->attach("remove_files[$index]", $path);
+            }
+        }
+
+        $response = $http->post('https://bepm.hanatekindo.com/api/v1/activity-docs/'. $id);
+
+        $responseData = $response->json();
+
+        if (in_array($responseData['status'], [400, 500])) {
+            return response()->json([
+                'status' => $responseData['status'],
+                'message' => $responseData['message'] ?? 'An error occurred',
+                'errors' => $responseData['errors'] ?? []
+            ]);
+        }
+
+        return response()->json([
+            'status' => 201,
+            'message' => 'Document updated successfully.',
+            'data' => $responseData
+        ]);
+    }
+
 
 
     /**
