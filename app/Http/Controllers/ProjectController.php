@@ -198,7 +198,7 @@ class ProjectController extends Controller
      */
     public function create(){
         $accessToken = session('user.access_token');
-        $responseCompanies = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/companies');
+        $responseCompanies = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/companies?limit=1000');
 
         if ($responseCompanies->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
