@@ -424,13 +424,13 @@ class ProjectController extends Controller
 
         $project = $responseProject->json()['data'][0];
 
-        $responseCompanies = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/companies');
+        $responseCompanies = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/companies?limit=1000');
 
         if ($responseCompanies->failed()) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
         }
 
-        $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users');
+        $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users?limit=1000');
 
         if ($responseUser->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch user data.');
