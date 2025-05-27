@@ -667,6 +667,13 @@
             docData.files.forEach((file, key) => {
                 // console.log(file)
                 let fileName = file.url.split('/').pop();
+                fileNameSplit = fileName.split('-');
+                fileName = fileNameSplit[2];
+                if(fileNameSplit.length > 2){
+                    for(let i = 3; i < fileNameSplit.length; i++){
+                        fileName += " |" + fileNameSplit[i];
+                    }
+                }
                 html_file_list += `
                     <tr>
                         <td>${fileName}</td>

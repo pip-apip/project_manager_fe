@@ -153,7 +153,7 @@ button:active {
                                                 <button class="dropdown-item {{ $project['status'] == 'CLOSED' ? 'active' : '' }}" onclick="changeStatus({{ $project['id'] }}, 'CLOSED')">CLOSED</button>
                                             </div>
                                             @else
-                                            <span class="badge bg-danger">
+                                            <span class="badge {{ $badge_bg }}">
                                                 {{$project['status']}}
                                             </span>
                                             @endif
