@@ -12,6 +12,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MediaLibraryController;
 
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ProfileController;
@@ -22,6 +23,14 @@ use App\Http\Middleware\RefershTokenMiddleware;
 use App\Http\Middleware\MaintenanceRedirect;
 use App\Http\Middleware\RoleMiddleware;
 
+
+
+//Media library routes
+Route::get('/mediaLibrary', [MediaLibraryController::class, 'mediaLibrary'])->name('media-library');
+
+//FILE UPLOADS CONTROLER
+Route::post('medialibrary/upload', [App\Http\Controllers\UploaderController::class, 'upload'])->name('file-upload');
+Route::post('medialibrary/delete', [App\Http\Controllers\UploaderController::class, 'delete'])->name('file-delete');
 
 Route::get('/', function () {
     return redirect()->route('login');
