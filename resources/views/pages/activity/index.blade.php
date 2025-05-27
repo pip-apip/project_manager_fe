@@ -74,18 +74,30 @@
                             <tbody id="table_body">
                             @if(is_object($results) && method_exists($results, 'firstItem'))
                                 @foreach ($results as $act)
+                                @php
+                                    $badge_bg = '';
+                                    if($act['status'] == 'DONE'){
+                                        $badge_bg = 'bg-success';
+                                    }else if($act['status'] == 'ON PROGRESS'){
+                                        $badge_bg = 'bg-info';
+                                    }
+                                @endphp
                                 <tr>
                                     <td class="text-center">{{ \Carbon\Carbon::parse($act['start_date'])->translatedFormat('d-m-Y') }}</td>
                                     <td>{{ $act['project_name'] }}</td>
                                     <td>{{ $act['title'] }}</td>
                                     <td class="text-center">
-                                        @if($act['activity_doc'] === false)
-                                        <span class="badge bg-warning">
-                                            On Progress
-                                        </span>
+                                        @if(session('user.role') == 'SUPERADMIN')
+                                        <button class="badge {{ $badge_bg }} border-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {{ $act['status'] ?? 'Undefined' }}
+                                        </button>
+                                        <div class="dropdown-menu" style="">
+                                            <button class="dropdown-item {{ $act['status'] == 'DONE' ? 'active' : '' }}" onclick="changeStatus({{ $act['id'] }}, 'DONE')">DONE</button>
+                                            <button class="dropdown-item {{ $act['status'] == 'ON PROGRESS' ? 'active' : '' }}" onclick="changeStatus({{ $act['id'] }}, 'ON PROGRESS')">ON PROGRESS</button>
+                                        </div>
                                         @else
-                                        <span class="badge bg-success">
-                                            Done
+                                        <span class="badge {{ $badge_bg }}">
+                                            {{$act['status']}}
                                         </span>
                                         @endif
                                     </td>
@@ -197,6 +209,43 @@
             }
         });
     });
+
+    function changeStatus(id, status){
+        $.ajax({
+            url: `https://bepm.hanatekindo.com/api/v1/activities/${id}`,
+            type: "PATCH",
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + @json(session('user.access_token')),
+            },
+            data: {
+                status: status
+                // _token: "{{ csrf_token() }}"
+            },
+            success: function (response) {
+                console.log(response);
+                if (response.status == 200) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            }
+        })
+    }
 
     function confirmDelete(url) {
         Swal.fire({
