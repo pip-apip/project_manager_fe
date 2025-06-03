@@ -32,7 +32,7 @@ class CompanyController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/companies/search', [
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/companies/search', [
             'name' => $q,
             'limit' => $perPage,
             'page' => $page
@@ -121,12 +121,12 @@ class CompanyController extends Controller
                 'Authorization' => 'Bearer '. $accessToken,
             ])
             ->attach('director_signature', file_get_contents($file), $file->getClientOriginalName())
-            ->post('https://bepm.hanatekindo.com/api/v1/companies', $data);
+            ->post(env('API_BASE_URL').'/companies', $data);
         } else {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer '. $accessToken,
             ])
-            ->post('https://bepm.hanatekindo.com/api/v1/companies', $data);
+            ->post(env('API_BASE_URL').'/companies', $data);
         }
 
         if ($response->json()['status'] !== 201) {
@@ -154,7 +154,7 @@ class CompanyController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->get("https://bepm.hanatekindo.com/api/v1/companies/{$id}");
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL')."/companies/{$id}");
 
         if ($response->failed()) {
             return redirect()->back()->withErrors('Failed to fetch company details.');
@@ -192,7 +192,7 @@ class CompanyController extends Controller
             $response = $requestHttp
                 ->attach('director_signature', file_get_contents($file), $file->getClientOriginalName())
                 ->asMultipart()
-                ->post("https://bepm.hanatekindo.com/api/v1/companies/{$id}", [
+                ->post(env('API_BASE_URL')."/companies/{$id}", [
                     ['name' => 'name', 'contents' => $validated['name']],
                     ['name' => 'address', 'contents' => $validated['address']],
                     ['name' => 'director_name', 'contents' => $validated['director_name']],
@@ -201,7 +201,7 @@ class CompanyController extends Controller
         } else {
             // If no file, just send JSON payload
             $response = $requestHttp
-                ->post("https://bepm.hanatekindo.com/api/v1/companies/{$id}", $validated);
+                ->post(env('API_BASE_URL')."/companies/{$id}", $validated);
                 // dd($response->json());
         }
 
@@ -220,7 +220,7 @@ class CompanyController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/companies/'.$id);
+        $response = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/companies/'.$id);
 
         if ($response->failed()) {
             return redirect()->back()->withErrors('Failed to delete company.');

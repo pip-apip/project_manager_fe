@@ -15,7 +15,7 @@ class ActivityController extends Controller
      */
     public function __construct()
     {
-        $checkIsProcess = Http::withToken(session('user.access_token'))->get('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'));
+        $checkIsProcess = Http::withToken(session('user.access_token'))->get(env('API_BASE_URL').'/users/'. session('user.id'));
         $this->isProcess = $checkIsProcess->json()['data'][0]['is_process'] ?? null;
     }
 
@@ -64,7 +64,7 @@ class ActivityController extends Controller
             $params['project_id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
         }
 
-        $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activities/search', $params);
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activities/search', $params);
 
         // tag all
         // https://bepm.hanatekindo.com/api/v1/activities/search?tags='possimus', 'asdasd'&description='possimus', 'asdasd'
@@ -134,7 +134,7 @@ class ActivityController extends Controller
         $response;
 
         if(session('user.role') == 'SUPERADMIN'){
-            $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/search', [
+            $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects/search', [
                 'limit' => 1000,
             ]);
         } else {
@@ -146,7 +146,7 @@ class ActivityController extends Controller
                     $project_id .= ",".session('user.project_id')[$i];
                 }
             }
-            $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/search', [
+            $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects/search', [
                 'id' => $project_id,
             ]);
         }
@@ -155,13 +155,13 @@ class ActivityController extends Controller
             return redirect()->back()->withErrors('Failed to fetch project.');
         }
 
-        $activityCategory = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-categories/search?limit=1000');
+        $activityCategory = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-categories/search?limit=1000');
 
         if ($activityCategory->failed()) {
             return redirect()->back()->withErrors('Failed to fetch doc category of activity data.');
         }
 
-        $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users/search?limit=1000');
+        $responseUser = Http::withToken($accessToken)->get(env('API_BASE_URL').'/users/search?limit=1000');
 
         if ($responseUser->failed()) {
             return redirect()->back()->withErrors('Failed to fetch activity data.');
@@ -195,7 +195,7 @@ class ActivityController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->post('https://bepm.hanatekindo.com/api/v1/activities', [
+        $response = Http::withToken($accessToken)->post(env('API_BASE_URL').'/activities', [
             'project_id' => $request->input('project_id'),
             'title' => $request->input('title'),
             'activity_category_id' => $request->input('activity_category_id'),
@@ -204,7 +204,7 @@ class ActivityController extends Controller
             'author_id' => session('user.id'),
         ]);
 
-        $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'), [
+        $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. session('user.id'), [
             'is_process' => TRUE,
         ]);
 
@@ -217,7 +217,7 @@ class ActivityController extends Controller
 
         if (is_array($activity_teams)) {
             foreach ($activity_teams as $team) {
-                $responseTeam = Http::withToken($accessToken)->post('https://bepm.hanatekindo.com/api/v1/activity-teams', [
+                $responseTeam = Http::withToken($accessToken)->post(env('API_BASE_URL').'/activity-teams', [
                     'activity_id' => $latestActivity,
                     'user_id' => $team['id'],
                 ]);
@@ -229,7 +229,7 @@ class ActivityController extends Controller
             }
         }
 
-        $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'), [
+        $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. session('user.id'), [
             'is_process' => TRUE,
         ]);
 
@@ -242,19 +242,19 @@ class ActivityController extends Controller
     public function show(string $id)
     {
         $accessToken = session('user.access_token');
-        $responseActivity = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activities/'.$id);
+        $responseActivity = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activities/'.$id);
 
         if ($responseActivity->failed()) {
             return redirect()->back()->withErrors('Failed to fetch activity data.');
         }
 
-        $responseDocActivity = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-docs/search?activity_id='.$id.'&limit=1000');
+        $responseDocActivity = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-docs/search?activity_id='.$id.'&limit=1000');
 
         if ($responseDocActivity->failed()) {
             return redirect()->back()->withErrors('Failed to fetch doc activity data.');
         }
 
-        $responseCategoryDocActivity = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-categories/search?limit=1000');
+        $responseCategoryDocActivity = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-categories/search?limit=1000');
 
         if ($responseCategoryDocActivity->failed()) {
             return redirect()->back()->withErrors('Failed to fetch doc category of activity data.');
@@ -274,143 +274,269 @@ class ActivityController extends Controller
      * Store a newly created resource doc.
      */
 
+    // public function storeDoc(Request $request)
+    // {
+    //     $accessToken = session('user.access_token');
+
+    //     $http = Http::withToken($accessToken);
+
+    //     // Attach text fields
+    //     $http->attach('title', $request->input('title'))
+    //         ->attach('description', $request->input('description'))
+    //         ->attach('tags', $request->input('tags'))
+    //         ->attach('activity_id', $request->input('activity_id'));
+
+    //     // Attach each file
+    //     if ($request->hasFile('files')) {
+    //         foreach ($request->file('files') as $index => $file) {
+    //             $http->attach(
+    //                 "files[$index]",                    // e.g., files[0], files[1]
+    //                 file_get_contents($file->getRealPath()),
+    //                 $file->getClientOriginalName()
+    //             );
+    //         }
+    //     }
+
+    //     $response = $http->post(env('API_BASE_URL').'/activity-docs');
+
+    //     if ($response->json()['status'] === 201) {
+    //         $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. session('user.id'), [
+    //             'is_process' => FALSE,
+    //         ]);
+    //     }
+
+    //     $responseData = $response->json();
+
+    //     if (in_array($responseData['status'], [400, 500])) {
+    //         return response()->json([
+    //             'status' => $responseData['status'],
+    //             'message' => $responseData['message'] ?? 'An error occurred',
+    //             'errors' => $responseData['errors'] ?? []
+    //         ]);
+    //     }
+
+    //     return response()->json([
+    //         'status' => 201,
+    //         'message' => 'Document uploaded successfully.',
+    //         'data' => $responseData
+    //     ]);
+    // }
+
+    // /**
+    //  * Update a document.
+    //  */
+
+    // public function updateDoc(Request $request, string $id)
+    // {
+    //     $accessToken = session('user.access_token');
+    //     // $debugData = [];
+
+    //     $http = Http::withToken($accessToken);
+
+    //     // Attach text fields
+    //     $http->attach('title', $request->input('title'))
+    //         ->attach('description', $request->input('description'))
+    //         ->attach('tags', $request->input('tags'));
+
+    //     // 1. Debug file baru
+    //     if ($request->hasFile('new_files')) {
+    //         foreach ($request->file('new_files') as $index => $file) {
+    //             // $debugData[] = [
+    //             //     'type' => 'new',
+    //             //     'original_name' => $file->getClientOriginalName(),
+    //             //     'size_kb' => round($file->getSize() / 1024, 2),
+    //             //     'mime_type' => $file->getMimeType(),
+    //             // ];
+    //             $http->attach(
+    //                 "files[$index]",
+    //                 file_get_contents($file->getRealPath()),
+    //                 $file->getClientOriginalName()
+    //             );
+    //         }
+    //     }
+
+    //     // 2. Debug file update dan path lama
+    //     $updateFiles = $request->file('update_files');
+    //     $replacePaths = $request->input('replace_paths');
+    //     $updateIndexes = $request->input('update_indexes');
+
+    //     if (is_array($updateFiles)) {
+    //         foreach ($updateFiles as $i => $file) {
+    //             $index = $updateIndexes[$i] ?? 'unknown';
+    //             $oldPath = $replacePaths[$i] ?? null;
+
+    //             // $debugData[] = [
+    //             //     'type' => 'update',
+    //             //     'index' => $index,
+    //             //     'original_name' => $file->getClientOriginalName(),
+    //             //     'replaced_old_path' => $oldPath,
+    //             // ];
+
+    //             $http->attach("replace_files[$index]", $oldPath);
+
+    //             $http->attach(
+    //                 "files[$index]",
+    //                 file_get_contents($file->getRealPath()),
+    //                 $file->getClientOriginalName()
+    //             );
+    //         }
+    //     }
+
+    //     // 3. Debug deleted files
+    //     if ($request->has('remove_files')) {
+    //         foreach ($request->input('remove_files') as $index => $path) {
+    //             // $debugData[] = [
+    //             //     'type' => 'deleted',
+    //             //     'deleted_path' => $path,
+    //             // ];
+    //             $http->attach("remove_files[$index]", $path);
+    //         }
+    //     }
+
+    //     $response = $http->post(env('API_BASE_URL').'/activity-docs/'. $id);
+
+    //     $responseData = $response->json();
+
+    //     if (in_array($responseData['status'], [400, 500])) {
+    //         return response()->json([
+    //             'status' => $responseData['status'],
+    //             'message' => $responseData['message'] ?? 'An error occurred',
+    //             'errors' => $responseData['errors'] ?? []
+    //         ]);
+    //     }
+
+    //     return response()->json([
+    //         'status' => 201,
+    //         'message' => 'Document updated successfully.',
+    //         'data' => $responseData
+    //     ]);
+    // }
+
     public function storeDoc(Request $request)
     {
         $accessToken = session('user.access_token');
-
         $http = Http::withToken($accessToken);
 
-        // Attach text fields
-        $http->attach('title', $request->input('title'))
-            ->attach('description', $request->input('description'))
-            ->attach('tags', $request->input('tags'))
-            ->attach('activity_id', $request->input('activity_id'));
+        // Handle text fields
+        $fields = ['title', 'description', 'tags', 'activity_id'];
+        foreach ($fields as $field) {
+            $http = $http->attach($field, $request->input($field));
+        }
 
-        // Attach each file
+        // Attach uploaded files
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $index => $file) {
-                $http->attach(
-                    "files[$index]",                    // e.g., files[0], files[1]
-                    file_get_contents($file->getRealPath()),
-                    $file->getClientOriginalName()
-                );
+                $content = @file_get_contents($file->getRealPath());
+                if ($content === false) {
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Gagal membaca file: ' . $file->getClientOriginalName(),
+                    ]);
+                }
+                $http = $http->attach("files[$index]", $content, $file->getClientOriginalName());
             }
         }
 
-        $response = $http->post('https://bepm.hanatekindo.com/api/v1/activity-docs');
-
-        if ($response->json()['status'] === 201) {
-            $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'), [
-                'is_process' => FALSE,
-            ]);
-        }
-
+        // Submit the request
+        $response = $http->post(env('API_BASE_URL').'/activity-docs');
         $responseData = $response->json();
 
         if (in_array($responseData['status'], [400, 500])) {
             return response()->json([
                 'status' => $responseData['status'],
-                'message' => $responseData['message'] ?? 'An error occurred',
-                'errors' => $responseData['errors'] ?? []
+                'message' => $responseData['message'] ?? 'Terjadi kesalahan.',
+                'errors' => $responseData['errors'] ?? [],
             ]);
+        }
+
+        // Update is_process
+        if ($responseData['status'] === 201) {
+            Http::withToken($accessToken)->patch(
+                env('API_BASE_URL').'/users/' . session('user.id'),
+                ['is_process' => false]
+            );
         }
 
         return response()->json([
             'status' => 201,
-            'message' => 'Document uploaded successfully.',
-            'data' => $responseData
+            'message' => 'Dokumen berhasil diunggah.',
+            'data' => $responseData,
         ]);
     }
-
-    /**
-     * Update a document.
-     */
 
     public function updateDoc(Request $request, string $id)
     {
         $accessToken = session('user.access_token');
-        // $debugData = [];
-
         $http = Http::withToken($accessToken);
 
-        // Attach text fields
-        $http->attach('title', $request->input('title'))
-            ->attach('description', $request->input('description'))
-            ->attach('tags', $request->input('tags'));
+        // Attach basic fields
+        $fields = ['title', 'description', 'tags'];
+        foreach ($fields as $field) {
+            $http = $http->attach($field, $request->input($field));
+        }
 
-        // 1. Debug file baru
+        // Handle new files
         if ($request->hasFile('new_files')) {
             foreach ($request->file('new_files') as $index => $file) {
-                // $debugData[] = [
-                //     'type' => 'new',
-                //     'original_name' => $file->getClientOriginalName(),
-                //     'size_kb' => round($file->getSize() / 1024, 2),
-                //     'mime_type' => $file->getMimeType(),
-                // ];
-                $http->attach(
-                    "files[$index]",
-                    file_get_contents($file->getRealPath()),
-                    $file->getClientOriginalName()
-                );
+                $content = @file_get_contents($file->getRealPath());
+                if ($content === false) {
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Gagal membaca file baru: ' . $file->getClientOriginalName(),
+                    ]);
+                }
+                $http = $http->attach("files[$index]", $content, $file->getClientOriginalName());
             }
         }
 
-        // 2. Debug file update dan path lama
-        $updateFiles = $request->file('update_files');
-        $replacePaths = $request->input('replace_paths');
-        $updateIndexes = $request->input('update_indexes');
+        // Handle updated files
+        $updateFiles = $request->file('update_files', []);
+        $replacePaths = $request->input('replace_paths', []);
+        $updateIndexes = $request->input('update_indexes', []);
 
-        if (is_array($updateFiles)) {
-            foreach ($updateFiles as $i => $file) {
-                $index = $updateIndexes[$i] ?? 'unknown';
-                $oldPath = $replacePaths[$i] ?? null;
+        foreach ($updateFiles as $i => $file) {
+            $index = $updateIndexes[$i] ?? $i;
+            $oldPath = $replacePaths[$i] ?? null;
 
-                // $debugData[] = [
-                //     'type' => 'update',
-                //     'index' => $index,
-                //     'original_name' => $file->getClientOriginalName(),
-                //     'replaced_old_path' => $oldPath,
-                // ];
-
-                $http->attach("replace_files[$index]", $oldPath);
-
-                $http->attach(
-                    "files[$index]",
-                    file_get_contents($file->getRealPath()),
-                    $file->getClientOriginalName()
-                );
+            if ($oldPath) {
+                $http = $http->attach("replace_files[$index]", $oldPath);
             }
+
+            $content = @file_get_contents($file->getRealPath());
+            if ($content === false) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Gagal membaca file update: ' . $file->getClientOriginalName(),
+                ]);
+            }
+
+            $http = $http->attach("files[$index]", $content, $file->getClientOriginalName());
         }
 
-        // 3. Debug deleted files
-        if ($request->has('remove_files')) {
-            foreach ($request->input('remove_files') as $index => $path) {
-                // $debugData[] = [
-                //     'type' => 'deleted',
-                //     'deleted_path' => $path,
-                // ];
-                $http->attach("remove_files[$index]", $path);
-            }
+        // Handle file deletions
+        foreach ($request->input('remove_files', []) as $index => $path) {
+            $http = $http->attach("remove_files[$index]", $path);
         }
 
-        $response = $http->post('https://bepm.hanatekindo.com/api/v1/activity-docs/'. $id);
-
+        // Submit to API (using POST as per your flow)
+        $response = $http->post("https://bepm.hanatekindo.com/api/v1/activity-docs/{$id}");
         $responseData = $response->json();
 
         if (in_array($responseData['status'], [400, 500])) {
             return response()->json([
                 'status' => $responseData['status'],
-                'message' => $responseData['message'] ?? 'An error occurred',
-                'errors' => $responseData['errors'] ?? []
+                'message' => $responseData['message'] ?? 'Terjadi kesalahan.',
+                'errors' => $responseData['errors'] ?? [],
             ]);
         }
 
         return response()->json([
             'status' => 201,
-            'message' => 'Document updated successfully.',
-            'data' => $responseData
+            'message' => 'Dokumen berhasil diperbarui.',
+            'data' => $responseData,
         ]);
     }
+
 
 
 
@@ -429,7 +555,7 @@ class ActivityController extends Controller
 
         $activity = $responseActivity->json()['data'][0];
 
-        $responseProject = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects');
+        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects');
 
         if ($responseProject->failed()) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
@@ -437,7 +563,7 @@ class ActivityController extends Controller
 
         $projects = $responseProject->json()['data'];
 
-        $responseDocAct = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-docs/search?activity_id='.$id);
+        $responseDocAct = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-docs/search?activity_id='.$id);
 
         if ($responseDocAct->failed()) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
@@ -445,7 +571,7 @@ class ActivityController extends Controller
 
         $countDocAct = count($responseDocAct->json()['data']);
 
-        $activityCategory = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-categories/search?limit=1000');
+        $activityCategory = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-categories/search?limit=1000');
 
 
         if ($activityCategory->failed()) {
@@ -472,7 +598,7 @@ class ActivityController extends Controller
         $accessToken = session('user.access_token');
 
         // dd($request->all());
-        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/activities/'.$id, [
+        $response = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/activities/'.$id, [
             'project_id' => $request->input('project_id'),
             'title' => $request->input('title'),
             'start_date' => date('Y-m-d', strtotime($request->input('start_date'))),
@@ -498,7 +624,7 @@ class ActivityController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $responseGet = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activities/'.$id);
+        $responseGet = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activities/'.$id);
 
         $author_id = $responseGet->json()['data'][0]['author_id'] ?? null;
         $acitivity_doc_status = $responseGet->json()['data'][0]['activity_doc'] ?? null;
@@ -507,7 +633,7 @@ class ActivityController extends Controller
             return redirect()->back()->with('error', 'Aktivitas tidak dapat dihapus karena sudah memiliki dokumen.');
         }
 
-        $responseDelete = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/activities/'.$id);
+        $responseDelete = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/activities/'.$id);
 
         if ($responseDelete->json()['status'] !== 200) {
             $errors = $responseDelete->json()['errors'];
@@ -515,7 +641,7 @@ class ActivityController extends Controller
             return redirect()->back()->withInput()->withErrors($errors);
         }
 
-        $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. $author_id, [
+        $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. $author_id, [
             'is_process' => false,
         ]);
 
@@ -526,7 +652,7 @@ class ActivityController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/activity-docs/'.$id);
+        $response = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/activity-docs/'.$id);
 
         if ($response->json()['status'] == 400 || $response->json()['status'] == 500) {
             $errors = $response->json()['errors'];

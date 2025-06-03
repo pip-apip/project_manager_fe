@@ -129,11 +129,12 @@
     let tags = [];
     let tagOptions = [];
     let selectedIndex = -1;
-    let baseUrl = 'https://bepm.hanatekindo.com/api/v1/';
+    // let baseUrl = env('API_BASE_URL').'/';
     let access_token = @json(session('user.access_token'))
 
     let dataDoc = {!! json_encode($activityDoc) !!}
     $(document).ready(function () {
+        console.log(dataDoc)
         renderDocs(dataDoc);
         mergeTags();
     });

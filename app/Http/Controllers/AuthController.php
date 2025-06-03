@@ -22,7 +22,7 @@ class AuthController extends Controller
             'password'  => 'required|string|min:8',
         ]);
 
-        $response = Http::post('https://bepm.hanatekindo.com/api/v1/auth/login', [
+        $response = Http::post(env('API_BASE_URL').'/auth/login', [
             'username'  => $validatedData['username'],
             'password'  => $validatedData['password'],
         ]);
@@ -43,7 +43,7 @@ class AuthController extends Controller
                 'currentRoute' => 'home',
             ]);
 
-            $responseTeams = Http::withToken($response->json('data.access_token'))->get('https://bepm.hanatekindo.com/api/v1/teams/search?user_id='.$response->json('data.id').'&limit=1000');
+            $responseTeams = Http::withToken($response->json('data.access_token'))->get(env('API_BASE_URL').'/teams/search?user_id='.$response->json('data.id').'&limit=1000');
 
             if($responseTeams->json('data')){
                 $teams = $responseTeams->json('data');
@@ -57,7 +57,7 @@ class AuthController extends Controller
                 session(['user.project_id' => []]);
             }
 
-            $responsePL = Http::withToken($response->json('data.access_token'))->get('https://bepm.hanatekindo.com/api/v1/projects/search?project_leader_id='.$response->json('data.id').'&limit=1000');
+            $responsePL = Http::withToken($response->json('data.access_token'))->get(env('API_BASE_URL').'/projects/search?project_leader_id='.$response->json('data.id').'&limit=1000');
             if($responsePL->json('data')){
                 $projects = $responsePL->json('data');
                 $projectIds = [];
@@ -71,6 +71,7 @@ class AuthController extends Controller
             }
 
             return redirect()->route('home')->with('success', 'Login successful.');
+            // return dd(session()->all());
 
         } elseif ($response->json('status') === 401) {
             $errorMessage = 'Invalid username or password.';
@@ -95,7 +96,7 @@ class AuthController extends Controller
             'user_password'  => 'required|string|min:8',
         ]);
 
-        $response = Http::post('https://bepm.hanatekindo.com/api/v1/auth/register', [
+        $response = Http::post(env('API_BASE_URL').'/auth/register', [
             'name'      => $request['name'],
             'username'  => $request['user_name'],
             'password'  => $request['user_password'],
@@ -117,7 +118,7 @@ class AuthController extends Controller
             return redirect()->route('login')->with('error', 'You are not logged in.');
         }
 
-        $response = Http::withToken($token)->post('https://bepm.hanatekindo.com/api/v1/auth/logout');
+        $response = Http::withToken($token)->post(env('API_BASE_URL').'/auth/logout');
 
         session()->forget(['user']);
         session()->flush();
@@ -127,5 +128,10 @@ class AuthController extends Controller
         }
 
         return redirect()->route('login')->with('error', 'Logout failed. Please try again.');
+    }
+
+    public function sessionFlush(){
+        session()->flush();
+        return redirect()->route('login');
     }
 }

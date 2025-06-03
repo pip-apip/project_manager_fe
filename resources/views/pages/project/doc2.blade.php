@@ -182,6 +182,10 @@
     $project = $data['project'];
     $doc = $data['docProject'];
     $categoryDoc = $data['categoryDoc'];
+
+    $ts = time();
+	// $user_id = Auth::user()->id;
+	$date = date("Y-m-d");
 @endphp
 
 <div class="page-heading">
@@ -191,7 +195,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-sm-8 col-8">
-                            <h1>Dokumen Administrasi <span class="d-none d-md-inline-block">Proyek</span></h1>
+                            <h1>Dokumen Administrasi 2 <span class="d-none d-md-inline-block">Proyek</span></h1>
                         </div>
                         <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
                             <a href="{{ route('project.index') }}" class="btn btn-secondary btn-sm">
@@ -241,23 +245,27 @@
                                 <label>Berkas Dokumen</label>
                             </div>
                             <div class="col-md-10">
-                                <div class="file-upload-wrapper" id="dropzone">
-                                    <label for="file-upload" class="file-upload-area @error('file') is-invalid @enderror">
-                                        <div class="upload-text" id="upload-text">
-                                            Drag & Drop your files or <span class="browse">Browse</span>
-                                        </div>
-                                        <input type="file" id="file-upload" name="file" />
-                                        <div class="file-preview" id="file-preview" style="display: none;">
-                                            <span class="file-info" id="file-name"></span>
-                                            <span class="remove-file" id="remove-file">&times;</span>
-                                        </div>
-                                    </label>
-                                </div>
+                                <form action="{{ env('API_BASE_URL') }}/upload/chunk" class="dropzone" id="datanodeupload">
+                                    @csrf
+                                </form>
+
+                                <input type="hidden" name="uploaded_file_name" id="uploaded_file_name">
                                 @error('file')
                                 <small class="file-error-text" style="color: #e74c3c;" id="file-error">
                                     {{ $message }}
                                 </small>
                                 @enderror
+                                {{-- <div id="uploaderHolder">
+                                    <form action="{{ route('file-upload') }}"
+                                        class="dropzone"
+                                        id="datanodeupload">
+
+                                        <input type="file" name="file"  style="display: none;">
+                                        <input type="hidden" name="dataTS" id="dataTS" value="{{ $ts }}">
+                                        <input type="hidden" name="dataDATE" id="dataDATE" value="{{ $date }}">
+                                        @csrf
+                                    </form>
+                                </div> --}}
                             </div>
                             <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
                                 <button type="submit"
@@ -267,6 +275,49 @@
                             </div>
                         </div>
                     </form>
+
+                    {{-- <div class="modal fade" id="uploaderModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="uploadModalLabel">{{ __('Upload file') }}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                        <div class="form-group row">
+                                            <h5>{{ __('Drag and drop multipe files') }}</h5>
+                                        </div>
+
+                                <div id="uploaderHolder">
+                                    <form action="{{ route('file-upload') }}"
+                                        class="dropzone"
+                                        id="datanodeupload">
+
+                                        <input type="file" name="file"  style="display: none;">
+                                        <input type="hidden" name="dataTS" id="dataTS" value="{{ $ts }}">
+                                        <input type="hidden" name="dataDATE" id="dataDATE" value="{{ $date }}">
+                                        @csrf
+                                    </form>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" onClick="window.location.reload();">{{ __('Done') }}</button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="col-md-12 mb-4">
+                                <button type="button" class="btn btn-primary btn-ico" data-toggle="modal" data-target="#uploaderModal"><i class="fa fa-files-o"></i> {{ __('File Upload') }}</button>
+                            </div>
+                        </div>
+                    </div> --}}
+
                 </div>
             </div>
         </section>
@@ -324,6 +375,53 @@
 <!-- filepond -->
 <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js" integrity="sha512-U2WE1ktpMTuRBPoCFDzomoIorbOyUv0sP8B+INA3EzNAhehbzED1rOJg6bCqPf/Tuposxb5ja/MAUnC8THSbLQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Dropzone.autoDiscover = false;
+
+        Dropzone.options.datanodeupload = {
+            parallelUploads: 1, // since we're using a global 'currentFile', we could have issues if parallelUploads > 1, so we'll make it = 1
+            maxFilesize: 1024, // max individual file size 1024 MB
+            chunking: true, // enable chunking
+            forceChunking: true, // forces chunking when file.size < chunkSize
+            parallelChunkUploads: true, // allows chunks to be uploaded in parallel (this is independent of the parallelUploads option)
+            chunkSize: 2000000, // chunk size 2,000,000 bytes (~2MB)
+            retryChunks: true, // retry chunks on failure
+            retryChunksLimit: 3, // retry maximum of 3 times (default is 3)
+            renameFile: function (file) {
+                var dt = new Date();
+                var time = dt.getTime();
+                return time + "_" + file.name;
+            },
+            acceptedFiles: ".pdf,.jpeg,.jpg,.png,.txt",
+            addRemoveLinks: true,
+            timeout: 50000
+            // init: function () {
+            //     this.on("success", function (file, response) {
+            //         console.log("Upload complete:", response);
+            //         document.getElementById("uploaded_file_name").value = response.file_name;
+            //     });
+
+            //     this.on("removedfile", function (file) {
+            //         const uploadedFileName = document.getElementById("uploaded_file_name").value;
+            //         if (uploadedFileName) {
+            //             fetch("{{ env('API_BASE_URL') }}/upload/delete-temp", {
+            //                 method: "POST",
+            //                 headers: {
+            //                     "Content-Type": "application/json",
+            //                     "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            //                 },
+            //                 body: JSON.stringify({ file: uploadedFileName })
+            //             });
+            //         }
+            //     });
+            // }
+        };
+    });
+</script>
+
 
 @if(session()->has('success'))
     <script>
@@ -487,7 +585,7 @@
 </script>
 
 {{-- File Upload Script --}}
-<script>
+{{-- <script>
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('file-upload');
     const fileName = document.getElementById('file-name');
@@ -533,9 +631,67 @@
             uploadText.style.display = 'none';
         }
     }
-</script>
+</script> --}}
 
+{{-- <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+<script>
+    var home_url = "{{env('APP_URL') }}";
+    var deleteAction = '{{ route("file-delete") }}';
+    var generalTS =  document.getElementById('dataTS').value;
+    var generalDATE = document.getElementById('dataDATE').value;
+    var token = '{!! csrf_token() !!}';
 
-</script>
+    Dropzone.options.datanodeupload =
+    {
+        parallelUploads: 1,  // since we're using a global 'currentFile', we could have issues if parallelUploads > 1, so we'll make it = 1
+        maxFilesize: 1024,   // max individual file size 1024 MB
+        chunking: true,      // enable chunking
+        forceChunking: true, // forces chunking when file.size < chunkSize
+        parallelChunkUploads: true, // allows chunks to be uploaded in parallel (this is independent of the parallelUploads option)
+        chunkSize: 2000000,  // chunk size 2,000,000 bytes (~2MB)
+        retryChunks: true,   // retry chunks on failure
+        retryChunksLimit: 3, // retry maximum of 3 times (default is 3)
+        renameFile: function(file) {
+        var dt = new Date();
+        var time = dt.getTime();
+        return time+"_"+file.name;
+        },
+        acceptedFiles: ".jpeg,.jpg,.png,.txt",
+        addRemoveLinks: true,
+        timeout: 50000,
+        removedfile: function(file) {
+        var name = file.upload.filename;
+        $.ajax({
+            headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'POST',
+            url: deleteAction,
+            data: {
+            filename: name,
+            ts: generalTS,
+            date: generalDATE,
+            },
+            success: function (data){
+            console.log("File has been successfully removed!!");
+            },
+            error: function(e) {
+            console.log(e);
+            }});
+            var fileRef;
+            return (fileRef = file.previewElement) != null ?
+            fileRef.parentNode.removeChild(file.previewElement) : void 0;
+        },
+
+        success: function(file, response)
+            {
+            console.log(response);
+            },
+        error: function(file, response)
+            {
+            return false;
+            }
+    };
+</script> --}}
 
 @endsection

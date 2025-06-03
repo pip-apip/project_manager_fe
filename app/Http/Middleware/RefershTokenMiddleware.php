@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
 
 class RefershTokenMiddleware
 {
@@ -22,7 +23,7 @@ class RefershTokenMiddleware
             // Test API request to check if the token is valid
             $response = Http::withToken($accessToken)
                             ->timeout(10)  // You can adjust the timeout value as needed
-                            ->get('https://bepm.hanatekindo.com/api/v1/users');
+                            ->get(env('API_BASE_URL').'/users');
 
             $responseStatus = $response->json()['status'];
 
@@ -65,7 +66,7 @@ class RefershTokenMiddleware
         }
 
         // Send a POST request to refresh the token
-        $response = Http::withToken($refreshToken)->post('https://bepm.hanatekindo.com/api/v1/auth/refresh', [
+        $response = Http::withToken($refreshToken)->post(env('API_BASE_URL').'/auth/refresh', [
             'refresh_token' => $refreshToken,
         ]);
 

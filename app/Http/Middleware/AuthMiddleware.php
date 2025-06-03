@@ -24,7 +24,7 @@ class AuthMiddleware
         //     $token = session('user.access_token');
 
         //     try {
-        //         Http::withToken($token)->post('https://bepm.hanatekindo.com/api/v1/auth/logout');
+        //         Http::withToken($token)->post(env('API_BASE_URL').'/auth/logout');
         //     } catch (\Exception $e) {
         //         return redirect('/login')->withErrors(['error' => 'Sesi telah berakhir, silakan login kembali']);
         //     }

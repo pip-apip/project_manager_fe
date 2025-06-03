@@ -125,7 +125,7 @@
                                 <label>Tanggal Akta Pendirian Perusahaan <code>*</code></label>
                             </div>
                             <div class="form-group col-md-10">
-                                <input type="date" placeholder="Masukkan Tanggal Akta Pendirian Perusahaan" class="form-control @error('established_date') is-invalid @enderror" name="established_date" id="established_date" value="{{ old('established_date', $company ? $company['established_date'] : '') }}" autocomplete="off" />
+                                <input type="date   " placeholder="Masukkan Tanggal Akta Pendirian Perusahaan" class="form-control @error('established_date') is-invalid @enderror" name="established_date" id="established_date" value="{{ old('established_date', $company ? $company['established_date'] : '') }}" autocomplete="off" />
                                 @error('established_date')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

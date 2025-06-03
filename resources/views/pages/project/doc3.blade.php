@@ -88,6 +88,11 @@
         position: relative;
         color: white;
         cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .file-upload-area.dragover {
+        background-color: #44403c;
     }
 
     .file-upload-wrapper input[type="file"] {
@@ -191,7 +196,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-sm-8 col-8">
-                            <h1>Dokumen Administrasi <span class="d-none d-md-inline-block">Proyek</span></h1>
+                            <h1>Dokumen Administrasi Doc 3<span class="d-none d-md-inline-block">Proyek</span></h1>
                         </div>
                         <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
                             <a href="{{ route('project.index') }}" class="btn btn-secondary btn-sm">
@@ -246,18 +251,28 @@
                                         <div class="upload-text" id="upload-text">
                                             Drag & Drop your files or <span class="browse">Browse</span>
                                         </div>
-                                        <input type="file" id="file-upload" name="file" />
+                                        <input type="file" id="file-upload" />
                                         <div class="file-preview" id="file-preview" style="display: none;">
                                             <span class="file-info" id="file-name"></span>
                                             <span class="remove-file" id="remove-file">&times;</span>
                                         </div>
                                     </label>
                                 </div>
+
+                                <!-- Error message -->
                                 @error('file')
                                 <small class="file-error-text" style="color: #e74c3c;" id="file-error">
                                     {{ $message }}
                                 </small>
                                 @enderror
+
+                                <!-- Hidden input to submit filename -->
+                                <input type="text" name="uploaded_file_name" id="uploaded_file_name">
+
+                                <!-- Progress Bar -->
+                                <div id="upload-progress" style="display: none; margin-top: 10px;">
+                                    <progress value="0" max="100" id="progress-bar" style="width: 100%;"></progress>
+                                </div>
                             </div>
                             <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
                                 <button type="submit"
@@ -494,7 +509,12 @@
     const uploadText = document.getElementById('upload-text');
     const filePreview = document.getElementById('file-preview');
     const removeFileBtn = document.getElementById('remove-file');
+    const progressBar = document.getElementById('progress-bar');
+    const progressContainer = document.getElementById('upload-progress');
+    const uploadedFileNameInput = document.getElementById('uploaded_file_name');
+    let access_token = @json(session('user.access_token'));
 
+    // Drag & Drop UI
     dropzone.addEventListener('dragover', function(e) {
         e.preventDefault();
         dropzone.classList.add('dragover');
@@ -513,29 +533,102 @@
         handleFile(files);
     });
 
-    fileInput.addEventListener('change', function() {
+    fileInput.addEventListener('change', function () {
         handleFile(fileInput.files);
     });
 
     removeFileBtn.addEventListener('click', function () {
-        fileInput.value = '';
-        fileName.textContent = '';
-        filePreview.style.display = 'none';
-        uploadText.style.display = 'block';
+        const uploadedFile = uploadedFileNameInput.value;
+
+        if (uploadedFile) {
+            console.log('delete', uploadedFile);
+            fetch("{{ env('API_BASE_URL') }}/delete/chunk", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access_token}`
+                },
+                body: JSON.stringify({ file: uploadedFile })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('delete response', data);
+                uploadedFileNameInput.value = '';
+                fileInput.value = '';
+                fileName.textContent = '';
+                filePreview.style.display = 'none';
+                uploadText.style.display = 'block';
+                progressContainer.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error deleting file:', error);
+            });
+        }
     });
 
-    function handleFile(files) {
+    async function handleFile(files) {
         if (files.length > 0) {
             const file = files[0];
             const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
             fileName.textContent = `${file.name} (${sizeMB} MB)`;
             filePreview.style.display = 'flex';
             uploadText.style.display = 'none';
+
+            await uploadFileInChunks(file);
+        }
+    }
+
+    async function uploadFileInChunks(file) {
+        const chunkSize = 1024 * 1024; // 1 MB
+        const totalChunks = Math.ceil(file.size / chunkSize);
+        const uploadUrl = "{{ env('API_BASE_URL') }}/doc/chunk-upload";
+        // const csrfToken = "{{ csrf_token() }}";
+
+        progressContainer.style.display = 'block';
+
+        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+            const start = chunkIndex * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+            const chunk = file.slice(start, end);
+
+            const formData = new FormData();
+            formData.append('file', chunk, file.name);
+            formData.append('chunkIndex', chunkIndex);
+            formData.append('totalChunks', totalChunks);
+            formData.append('originalName', file.name);
+            // formData.append('_token', csrfToken);
+
+            try {
+                const response = await fetch(uploadUrl, {
+                    method: 'POST',
+                    headers: {
+                        "Authorization": `Bearer ${access_token}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || "Upload error");
+                }
+
+                // Update progress bar
+                progressBar.value = ((chunkIndex + 1) / totalChunks) * 100;
+
+                if (result.done === true && result.file_name) {
+                    uploadedFileNameInput.value = result.file_name;
+                }
+
+                console.log(result);
+            } catch (err) {
+                alert("Upload error: " + err.message);
+                progressContainer.style.display = 'none';
+                return;
+            }
         }
     }
 </script>
 
-
-</script>
 
 @endsection

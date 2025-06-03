@@ -32,7 +32,7 @@ class CategoryAdmController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/admin-doc-categories/search', [
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/admin-doc-categories/search', [
             'name' => $q,
             'limit' => $perPage,
             'page' => $page
@@ -95,7 +95,7 @@ class CategoryAdmController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->post('https://bepm.hanatekindo.com/api/v1/admin-doc-categories?limit=1000', [
+        $response = Http::withToken($accessToken)->post(env('API_BASE_URL').'/admin-doc-categories?limit=1000', [
             'name' => $request->input('name'),
         ]);
 
@@ -146,7 +146,7 @@ class CategoryAdmController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/admin-doc-categories/'.$id, [
+        $response = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/admin-doc-categories/'.$id, [
             'name' => $request->input('name'),
         ]);
 
@@ -166,7 +166,7 @@ class CategoryAdmController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/admin-doc-categories/'.$id);
+        $response = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/admin-doc-categories/'.$id);
 
         if ($response->failed()) {
             return redirect()->back()->withErrors('Failed to delete category.');

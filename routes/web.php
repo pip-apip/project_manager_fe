@@ -13,6 +13,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MediaLibraryController;
+use App\Http\Controllers\UploaderController;
 
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ProfileController;
@@ -36,6 +37,8 @@ Route::get('/', function () {
     return redirect()->route('login');
     // return view('maintenance');
 });
+
+Route::get('flush', [AuthController::class, 'sessionFlush'])->name('flush');
 
 // Auth
 Route::get('login', [AuthController::class, 'login'])->name('login');
@@ -98,6 +101,7 @@ Route::middleware([AuthMiddleware::class, RefershTokenMiddleware::class])->group
     Route::get('project/destroy/{id}', [ProjectController::class, 'destroy'])->name('project.destroy');
 
     Route::get('project/doc/{id}', [ProjectController::class, 'show'])->name('project.doc');
+    Route::get('project/doc2/{id}', [ProjectController::class, 'show2'])->name('project.doc2');
     Route::post('project/storeDoc', [ProjectController::class, 'storeDoc'])->name('project.store.doc');
     Route::get('project/destroyDoc/{id}', [ProjectController::class, 'destroyDoc'])->name('project.destroy.doc');
 
@@ -107,6 +111,8 @@ Route::middleware([AuthMiddleware::class, RefershTokenMiddleware::class])->group
 
     Route::post('project/filter', [ProjectController::class, 'filter'])->name('project.filter');
     Route::get('project/reset', [ProjectController::class, 'reset'])->name('project.reset');
+
+    // Route::post('project/uploadChunk', [UploaderController::class, 'uploadChunk'])->name('project.upload.chunk');
 
     // Activity
     Route::get('activity', [ActivityController::class, 'index'])->name('activity.index');

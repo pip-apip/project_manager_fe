@@ -29,7 +29,7 @@ class UserController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users/search', [
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/users/search', [
             'name' => $q,
             'limit' => $perPage,
             'page' => $page
@@ -154,7 +154,7 @@ class UserController extends Controller
             $data['confirm_new_password'] = $request['confirm_new_password'];
         }
 
-        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'.$id , $data);
+        $response = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'.$id , $data);
 
         if ($response->json()['status'] === 200) {
             return redirect()->route('user.index')->with('success', 'Data User edited successfully.');

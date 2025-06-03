@@ -233,8 +233,8 @@ button:active {
                             <div class="form-group">
                                 <p class="form-control-static" id="director_name_detail"></p>
                             </div>
-                            <label><b> No.Telp Direktur : </b></label>
-                            <div class="form-group">
+                            <label style="visibility: hidden"><b> No.Telp Direktur : </b></label>
+                            <div class="form-group" style="visibility: hidden">
                                 <p class="form-control-static" id="director_phone_detail"></p>
                             </div>
                         </div>
@@ -734,7 +734,7 @@ button:active {
         $("#company_name_detail").text(data.company_name);
         $("#company_address_detail").text(data.company_address);
 
-        $("#project_leader_detail").text(data.project_leader_name);
+        $("#project_leader_detail").text(data.project_leader_name ? data.project_leader_name : '-');
         $("#director_name_detail").text(data.company_director_name);
         $("#director_phone_detail").text(data.company_director_phone);
 
