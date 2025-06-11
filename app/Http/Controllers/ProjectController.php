@@ -290,15 +290,14 @@ class ProjectController extends Controller
         //     'admin_doc_category_id' => 'required',
         // ]);
 
-        dd($request->all());
         $accessToken = session('user.access_token');
-        $file = $request->file('file');
 
         // Prepare the data
         $data = [
             'title' => $request->input('title'),
             'project_id' => $request->input('project_id'),
             'admin_doc_category_id' => $request->input('admin_doc_category_id'),
+            'file' => $request->input('uploaded_file_name')
         ];
 
         $response = Http::withHeaders([

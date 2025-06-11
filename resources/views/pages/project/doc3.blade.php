@@ -156,6 +156,43 @@
         background-color: #7b4a4a;
     }
 
+    /* Upload Progress Wrapper */
+    #upload-progress {
+        width: 100%;
+        background-color: #3e3b39;
+        border-radius: 8px;
+        overflow: hidden;
+        height: 12px;
+        position: relative;
+    }
+
+    /* Progress Bar */
+    #progress-bar {
+        appearance: none;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+    }
+
+    /* Chrome, Safari, Opera */
+    #progress-bar::-webkit-progress-bar {
+        background-color: #3e3b39;
+        border-radius: 8px;
+    }
+
+    #progress-bar::-webkit-progress-value {
+        background-color: #990002;
+        border-radius: 8px;
+        transition: width 0.4s ease;
+    }
+
+    /* Firefox */
+    #progress-bar::-moz-progress-bar {
+        background-color: #990002;
+        border-radius: 8px;
+        transition: width 0.4s ease;
+    }
+
 
     /* 🔥 Responsive for Mobile */
     @media screen and (max-width: 768px) {
@@ -256,6 +293,10 @@
                                             <span class="file-info" id="file-name"></span>
                                             <span class="remove-file" id="remove-file">&times;</span>
                                         </div>
+
+                                        <div id="upload-progress" style="display: none; margin-top: 10px;">
+                                            <progress value="0" max="100" id="progress-bar" style="width: 100%;"></progress>
+                                        </div>
                                     </label>
                                 </div>
 
@@ -267,12 +308,7 @@
                                 @enderror
 
                                 <!-- Hidden input to submit filename -->
-                                <input type="text" name="uploaded_file_name" id="uploaded_file_name">
-
-                                <!-- Progress Bar -->
-                                <div id="upload-progress" style="display: none; margin-top: 10px;">
-                                    <progress value="0" max="100" id="progress-bar" style="width: 100%;"></progress>
-                                </div>
+                                <input type="text" name="uploaded_file_name" id="uploaded_file_name" style="display: none">
                             </div>
                             <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
                                 <button type="submit"
@@ -543,7 +579,7 @@
         if (uploadedFile) {
             console.log('delete', uploadedFile);
             fetch("{{ env('API_BASE_URL') }}/delete/chunk", {
-                method: 'POST',
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${access_token}`
@@ -584,7 +620,7 @@
         const uploadUrl = "{{ env('API_BASE_URL') }}/doc/chunk-upload";
         // const csrfToken = "{{ csrf_token() }}";
 
-        progressContainer.style.display = 'block';
+        progressContainer.style.display = 'flex';
 
         for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
             const start = chunkIndex * chunkSize;
@@ -592,10 +628,11 @@
             const chunk = file.slice(start, end);
 
             const formData = new FormData();
+            formData.append('upload_id', "{{ $project['id'] }}");
             formData.append('file', chunk, file.name);
-            formData.append('chunkIndex', chunkIndex);
-            formData.append('totalChunks', totalChunks);
-            formData.append('originalName', file.name);
+            formData.append('chunk_index', chunkIndex);
+            formData.append('total_chunks', totalChunks);
+            formData.append('original_name', file.name);
             // formData.append('_token', csrfToken);
 
             try {
@@ -616,8 +653,8 @@
                 // Update progress bar
                 progressBar.value = ((chunkIndex + 1) / totalChunks) * 100;
 
-                if (result.done === true && result.file_name) {
-                    uploadedFileNameInput.value = result.file_name;
+                if (result.message === "Upload complete" && result.data.file) {
+                    uploadedFileNameInput.value = result.data.file;
                 }
 
                 console.log(result);
