@@ -293,7 +293,7 @@
         $('#activity_id').val(id);
         activity = activities.find(activity => activity.id === id);
 
-        let path = "https://bepm.hanatekindo.com/storage/"
+        let path = env('API_BASE_URL_MAIN')."/storage/"
         images = activity.images || [];
 
         let html = '';
@@ -330,7 +330,7 @@
     }
 
     function editImage(index, path) {
-        console.log('Edit image at index:', index);
+        // console.log('Edit image at index:', index);
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
@@ -355,7 +355,7 @@
     }
 
     function deleteImage(index, path) {
-        console.log('Delete image at index:', index);
+        // console.log('Delete image at index:', index);
 
         // Tambahkan ke list file yang akan dihapus
         deletePaths.push(path);
@@ -397,11 +397,11 @@
         formData.append('_token', '{{ csrf_token() }}');
 
         // Debug
-        console.log({
-            new_files: selectedFiles,
-            update: updateFiles,
-            delete: deletePaths
-        });
+        // console.log({
+        //     new_files: selectedFiles,
+        //     update: updateFiles,
+        //     delete: deletePaths
+        // });
 
         $.ajax({
             url: `{{ route('progress.updateImage', ':id') }}`.replace(':id', idActivityOpened),
@@ -410,7 +410,7 @@
             processData: false,
             contentType: false,
             success: function(response) {
-                console.log('Upload successful:', response);
+                // console.log('Upload successful:', response);
                 buttonLoadingEnd("save-button");
                 Swal.fire({
                     icon: 'success',
@@ -443,7 +443,7 @@
             processData: false,
             contentType: false,
             success: function(response) {
-                console.log('Upload successful:', response);
+                // console.log('Upload successful:', response);
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',

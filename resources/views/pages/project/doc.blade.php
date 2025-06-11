@@ -364,13 +364,13 @@
     let data_doc = {!! json_encode($doc) !!};
 
     $(document).ready(function () {
-        console.log(data_doc);
+        // console.log(data_doc);
         showDataDoc(data_doc);
     });
 
     function showDataDoc(data) {
         $('#table_body').empty();
-        let url = "https://bepm.hanatekindo.com";
+        let url = env('API_BASE_URL_MAIN')";
         let rows = "";
         if (data.length == 0) {
             rows += `
@@ -399,7 +399,7 @@
     // $('#category_show').change(function(){
     //     console.log(data_doc);
     //     let id_category = $(this).val();
-    //     let url = "https://bepm.hanatekindo.com";
+    //     let url = env('API_BASE_URL_MAIN')";
 
     //     let filteredDoc = data_doc.filter(doc =>
     //         doc.admin_doc_category.id == id_category

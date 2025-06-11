@@ -129,7 +129,7 @@
     let tags = [];
     let tagOptions = [];
     let selectedIndex = -1;
-    let baseUrl = 'https://bepm.hanatekindo.com/api/v1/';
+    let baseUrl = "{{ env('API_BASE_URL') }}/";
     let access_token = @json(session('user.access_token'))
 
     let dataDoc = {!! json_encode($activityDoc) !!}
@@ -165,7 +165,7 @@
             let shortDescription = doc.description.length > 350
                 ? doc.description.substring(0, 350) + " ...."
                 : doc.description;
-                console.log(doc)
+                // console.log(doc)
             content_doc += `
                 <div class="card" style="margin-bottom: 1.1rem;">
                     <div class="card-body">
@@ -196,7 +196,7 @@
 
     function readModal(id) {
         let doc = dataDoc.find(doc => doc.id === id);
-        console.log("readModal",doc);
+        // console.log("readModal",doc);
         let modal = $('#readModal');
         modal.find('#activity_name').text(doc.title);
         modal.find('#doc_title').text(doc.title);

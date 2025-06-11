@@ -212,7 +212,7 @@
 
     function changeStatus(id, status){
         $.ajax({
-            url: `https://bepm.hanatekindo.com/api/v1/activities/${id}`,
+            url: "{{ env('API_BASE_URL') }}/activities/" + id,
             type: "PATCH",
             headers: {
                 'Accept': 'application/json',
@@ -223,7 +223,7 @@
                 // _token: "{{ csrf_token() }}"
             },
             success: function (response) {
-                console.log(response);
+                // console.log(response);
                 if (response.status == 200) {
                     Swal.fire({
                         icon: 'success',

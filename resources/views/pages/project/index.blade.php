@@ -431,7 +431,7 @@ button:active {
 
     document.addEventListener("DOMContentLoaded", function () {
         setUser();
-        console.log(JSON.stringify(@json(session('lastRoute')), null, 2));
+        // console.log(JSON.stringify(@json(session('lastRoute')), null, 2));
     });
 
     $('#teamModal').on('hidden.bs.modal', function () {
@@ -445,7 +445,7 @@ button:active {
     });
 
     function teamModal(id, projectName, projectLeader, projectLeaderId, status){
-        console.log(status)
+        // console.log(status)
         teams.forEach(function (team) {
             if (team.project_id == id) {
                 teamFix = team.members;
@@ -557,7 +557,7 @@ button:active {
                 project_id: $('#project_id').val()
             },
             success: function (response) {
-                console.log(response);
+                // console.log(response);
                 if (response.status === 'success') {
                     Swal.fire({
                         icon: 'success',
@@ -690,7 +690,7 @@ button:active {
 
     function changeStatus(id, status){
         $.ajax({
-            url: `https://bepm.hanatekindo.com/api/v1/projects/${id}`,
+            url: "{{ env('API_BASE_URL') }}/projects/" + id,
             type: "PATCH",
             headers: {
                 'Accept': 'application/json',
@@ -701,7 +701,7 @@ button:active {
                 // _token: "{{ csrf_token() }}"
             },
             success: function (response) {
-                console.log(response);
+                // console.log(response);
                 if (response.status == 200) {
                     Swal.fire({
                         icon: 'success',
@@ -726,7 +726,7 @@ button:active {
     }
 
     function showDetail(data){
-        console.log(data);
+        // console.log(data);
         let onclickDelete = `confirmDelete("` + `{{ url('project/destroy/${data.id}') }} ")`;
         // let onclickDelete = `confirmDelete("` + `{{ route('project.destroy', ':id') }}`.replace(':id', data.id) + ` ")`;
 

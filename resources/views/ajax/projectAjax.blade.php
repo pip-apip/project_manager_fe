@@ -38,7 +38,7 @@
 
 <script>
     let id_project = 0;
-    let backendUrl = 'https://bepm.hanatekindo.com/api/v1/';
+    let backendUrl = env('API_BASE_URL').'/';
     let access_token = @json(session('user.access_token'));
     $(document).ready(function () {
         let data_projects = [];
@@ -112,9 +112,9 @@
                         console.error("Invalid API response:", response);
                         return;
                     }
-    
+
                     let rows = ""; // Variable to store generated rows
-    
+
                     $.each(response.data, function (index, project) {
                         rows += `
                         <tr>
@@ -143,9 +143,9 @@
                             </td>
                         </tr>`;
                     });
-    
+
                     $("#table-body").html(rows);
-    
+
                     let table1 = document.querySelector('#table1');
                     let dataTable = new simpleDatatables.DataTable(table1);
                 }else{
@@ -239,7 +239,7 @@
             contentType: 'application/json',
             success: function (response) {
                 $('#fullPageLoader').hide();
-                if(response.status === 400) { 
+                if(response.status === 400) {
                     let errors = response.errors;
 
                     $.each(errors, function (key, messages) {
@@ -293,7 +293,7 @@
             contentType: false,
             success: function (response) {
                 $('#fullPageLoader').hide();
-                if(response.status === 400) { 
+                if(response.status === 400) {
                     let errors = response.errors;
 
                     $.each(errors, function (key, messages) {
@@ -396,7 +396,7 @@
                 });
             }
         });
-            
+
     }
 
     // ================== Document Modal ==================
@@ -428,20 +428,20 @@
             success: function (response) {
                 if(response.status === 200){
                     // console.log(response);
-    
+
                     if (!response || !response.data) {
                         console.error("Invalid API response:", response);
                         return;
                     }
-    
+
                     let rows = ""; // Variable to store generated rows
                     rows += `<option value="#">Select Category</option>`;
-    
+
                     $.each(response.data, function (index, category) {
                         rows += `
                         <option value="${ category.id }">${ category.name }</option>`;
                     });
-    
+
                     $("#category_input").html(rows);
                     $("#category_show").html(rows);
                 }else{
@@ -519,7 +519,7 @@
             contentType: false,
             success: function (response) {
                 $('#fullPageLoader').hide();
-                if(response.status === 400) { 
+                if(response.status === 400) {
                     let errors = response.errors;
 
                     $.each(errors, function (key, messages) {
@@ -556,7 +556,7 @@
 
     $('#category_show').change(function(){
         let id_category = $(this).val();
-        let url = "https://bepm.hanatekindo.com";
+        let url = env('API_BASE_URL_MAIN');
         console.log(id_category);
         let filteredDoc = data_doc.filter(doc =>
             doc.admin_doc_category.id == id_category
@@ -609,9 +609,9 @@
                         let filteredData = response.data.filter(doc =>
                             doc.project.id === id_project
                         );
-    
+
                         data_doc = filteredData;
-    
+
                         console.log("Filtered Data:", data_doc);
                     // });
                 }else{
@@ -664,7 +664,7 @@
                         console.log(response);
                     }
                 },
-                error: function (xhr) {		
+                error: function (xhr) {
                     if (xhr.status === 401) {
                         console.log("Token expired. Refreshing token...");
                         refreshToken();

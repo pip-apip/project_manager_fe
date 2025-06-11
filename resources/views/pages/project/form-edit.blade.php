@@ -348,9 +348,9 @@
     let teamFix = [];
     let supportTeam = [];
 
-    document.addEventListener("DOMContentLoaded", function () {
-        console.log(JSON.stringify(@json(session('lastRoute')), null, 2));
-    });
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     console.log(JSON.stringify(@json(session('lastRoute')), null, 2));
+    // });
 
     $(document).ready(function() {
         $('#submitButtonPage1').on('click', function() {

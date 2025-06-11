@@ -405,7 +405,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="table-body">
-                                                @php $i = 1; $url = 'https://bepm.hanatekindo.com/storage/';@endphp
+                                                @php $i = 1; $url = env('API_BASE_URL_MAIN').'//storage/';@endphp
                                                 @if ($data['docActivity'])
                                                 @foreach ($data['docActivity'][0]['files'] as $doc)
                                                     <tr>
@@ -436,7 +436,7 @@
                                     {{-- <table style="width: 100%">
                                         <tr>
                                             @if($data['docActivity'] !== [])
-                                            @php $url = "https://bepm.hanatekindo.com"; $i = 0; @endphp
+                                            @php $url = env('API_BASE_URL_MAIN').`/"; $i = 0; @endphp
                                             @foreach ($data['docActivity'][0]['files'] as $doc)
                                                 <td style="text-align: center;">
                                                     <a onclick="openModernModal('{{ $url . $doc }}')" style="text-decoration: none; color: grey; font-size: 40px; cursor: pointer">
@@ -600,7 +600,7 @@
     }
 
     function showDoc(data) {
-        console.log(data);
+        // console.log(data);
         let title = data[0]['title']
         let description = data[0]['description']
         let tags = data[0]['tags'];
@@ -641,7 +641,7 @@
         tags = docData.tags || [];
         renderTags();
 
-        let path = "https://bepm.hanatekindo.com/storage/"
+        let path = env('API_BASE_URL_MAIN')."/storage/"
         let html = '';
         let html_file_list = '';
         if (docData.files.length > 0) {
@@ -708,7 +708,7 @@
     }
 
     function editFile(index, path) {
-        console.log('Edit file at index:', index);
+        // console.log('Edit file at index:', index);
         const input = document.createElement('input');
         input.type = 'file';
 
@@ -732,7 +732,7 @@
     }
 
     function deleteFile(index, path) {
-        console.log('Delete file at index:', index);
+        // console.log('Delete file at index:', index);
 
         // Tambahkan ke list file yang akan dihapus
         deletePaths.push(path);
@@ -795,7 +795,7 @@
             processData: false,
             contentType: false,
             success: function (response) {
-                console.log('response',response);
+                // console.log('response',response);
                 buttonLoadingEnd("submitButton");
                 if(response.status === 400 || response.status === 500){
                     Swal.fire({
@@ -844,7 +844,7 @@
             processData: false,
             contentType: false,
             success: function (response) {
-                console.log('response',response);
+                // console.log('response',response);
                 buttonLoadingEnd("submitButton");
                 if(response.status === 400 || response.status === 500){
                     Swal.fire({
@@ -920,7 +920,7 @@
             cancelButtonColor: '#d33',
             confirmButtonText: 'Ya, Hapus!',
         }).then((result) => {
-            console.log(result)
+            // console.log(result)
             if (result.isConfirmed) {
                 $('#fullPageLoader').show();
                 window.location.href = url;
