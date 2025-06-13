@@ -15,7 +15,7 @@ class ActivityController extends Controller
      */
     public function __construct()
     {
-        $checkIsProcess = Http::withToken(session('user.access_token'))->get('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'));
+        $checkIsProcess = Http::withToken(session('user.access_token'))->get(env('API_BASE_URL').'/users/'. session('user.id'));
         $this->isProcess = $checkIsProcess->json()['data'][0]['is_process'] ?? null;
     }
 
@@ -64,7 +64,7 @@ class ActivityController extends Controller
             $params['project_id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
         }
 
-        $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activities/search', $params);
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activities/search', $params);
 
         // tag all
         // https://bepm.hanatekindo.com/api/v1/activities/search?tags='possimus', 'asdasd'&description='possimus', 'asdasd'
@@ -134,7 +134,7 @@ class ActivityController extends Controller
         $response;
 
         if(session('user.role') == 'SUPERADMIN'){
-            $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/search', [
+            $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects/search', [
                 'limit' => 1000,
             ]);
         } else {
@@ -146,7 +146,7 @@ class ActivityController extends Controller
                     $project_id .= ",".session('user.project_id')[$i];
                 }
             }
-            $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/search', [
+            $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects/search', [
                 'id' => $project_id,
             ]);
         }
@@ -155,13 +155,13 @@ class ActivityController extends Controller
             return redirect()->back()->withErrors('Failed to fetch project.');
         }
 
-        $activityCategory = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-categories/search?limit=1000');
+        $activityCategory = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-categories/search?limit=1000');
 
         if ($activityCategory->failed()) {
             return redirect()->back()->withErrors('Failed to fetch doc category of activity data.');
         }
 
-        $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users/search?limit=1000');
+        $responseUser = Http::withToken($accessToken)->get(env('API_BASE_URL').'/users/search?limit=1000');
 
         if ($responseUser->failed()) {
             return redirect()->back()->withErrors('Failed to fetch activity data.');
@@ -195,7 +195,7 @@ class ActivityController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->post('https://bepm.hanatekindo.com/api/v1/activities', [
+        $response = Http::withToken($accessToken)->post(env('API_BASE_URL').'/activities', [
             'project_id' => $request->input('project_id'),
             'title' => $request->input('title'),
             'activity_category_id' => $request->input('activity_category_id'),
@@ -204,7 +204,7 @@ class ActivityController extends Controller
             'author_id' => session('user.id'),
         ]);
 
-        $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'), [
+        $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. session('user.id'), [
             'is_process' => TRUE,
         ]);
 
@@ -217,7 +217,7 @@ class ActivityController extends Controller
 
         if (is_array($activity_teams)) {
             foreach ($activity_teams as $team) {
-                $responseTeam = Http::withToken($accessToken)->post('https://bepm.hanatekindo.com/api/v1/activity-teams', [
+                $responseTeam = Http::withToken($accessToken)->post(env('API_BASE_URL').'/activity-teams', [
                     'activity_id' => $latestActivity,
                     'user_id' => $team['id'],
                 ]);
@@ -229,7 +229,7 @@ class ActivityController extends Controller
             }
         }
 
-        $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'), [
+        $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. session('user.id'), [
             'is_process' => TRUE,
         ]);
 
@@ -242,19 +242,19 @@ class ActivityController extends Controller
     public function show(string $id)
     {
         $accessToken = session('user.access_token');
-        $responseActivity = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activities/'.$id);
+        $responseActivity = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activities/'.$id);
 
         if ($responseActivity->failed()) {
             return redirect()->back()->withErrors('Failed to fetch activity data.');
         }
 
-        $responseDocActivity = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-docs/search?activity_id='.$id.'&limit=1000');
+        $responseDocActivity = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-docs/search?activity_id='.$id.'&limit=1000');
 
         if ($responseDocActivity->failed()) {
             return redirect()->back()->withErrors('Failed to fetch doc activity data.');
         }
 
-        $responseCategoryDocActivity = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-categories/search?limit=1000');
+        $responseCategoryDocActivity = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-categories/search?limit=1000');
 
         if ($responseCategoryDocActivity->failed()) {
             return redirect()->back()->withErrors('Failed to fetch doc category of activity data.');
@@ -297,10 +297,10 @@ class ActivityController extends Controller
             }
         }
 
-        $response = $http->post('https://bepm.hanatekindo.com/api/v1/activity-docs');
+        $response = $http->post(env('API_BASE_URL').'/activity-docs');
 
         if ($response->json()['status'] === 201) {
-            $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. session('user.id'), [
+            $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. session('user.id'), [
                 'is_process' => FALSE,
             ]);
         }
@@ -393,7 +393,7 @@ class ActivityController extends Controller
             }
         }
 
-        $response = $http->post('https://bepm.hanatekindo.com/api/v1/activity-docs/'. $id);
+        $response = $http->post(env('API_BASE_URL').'/activity-docs/'. $id);
 
         $responseData = $response->json();
 
@@ -421,7 +421,7 @@ class ActivityController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $responseActivity = Http::withToken($accessToken)->get("https://bepm.hanatekindo.com/api/v1/activities/{$id}");
+        $responseActivity = Http::withToken($accessToken)->get(env('API_BASE_URL')."/activities/{$id}");
 
         if ($responseActivity->failed()) {
             return redirect()->back()->withErrors('Failed to fetch category details.');
@@ -429,7 +429,7 @@ class ActivityController extends Controller
 
         $activity = $responseActivity->json()['data'][0];
 
-        $responseProject = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects');
+        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects');
 
         if ($responseProject->failed()) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
@@ -437,7 +437,7 @@ class ActivityController extends Controller
 
         $projects = $responseProject->json()['data'];
 
-        $responseDocAct = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-docs/search?activity_id='.$id);
+        $responseDocAct = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-docs/search?activity_id='.$id);
 
         if ($responseDocAct->failed()) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
@@ -445,7 +445,7 @@ class ActivityController extends Controller
 
         $countDocAct = count($responseDocAct->json()['data']);
 
-        $activityCategory = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-categories/search?limit=1000');
+        $activityCategory = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-categories/search?limit=1000');
 
 
         if ($activityCategory->failed()) {
@@ -472,7 +472,7 @@ class ActivityController extends Controller
         $accessToken = session('user.access_token');
 
         // dd($request->all());
-        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/activities/'.$id, [
+        $response = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/activities/'.$id, [
             'project_id' => $request->input('project_id'),
             'title' => $request->input('title'),
             'start_date' => date('Y-m-d', strtotime($request->input('start_date'))),
@@ -498,7 +498,7 @@ class ActivityController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $responseGet = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activities/'.$id);
+        $responseGet = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activities/'.$id);
 
         $author_id = $responseGet->json()['data'][0]['author_id'] ?? null;
         $acitivity_doc_status = $responseGet->json()['data'][0]['activity_doc'] ?? null;
@@ -507,7 +507,7 @@ class ActivityController extends Controller
             return redirect()->back()->with('error', 'Aktivitas tidak dapat dihapus karena sudah memiliki dokumen.');
         }
 
-        $responseDelete = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/activities/'.$id);
+        $responseDelete = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/activities/'.$id);
 
         if ($responseDelete->json()['status'] !== 200) {
             $errors = $responseDelete->json()['errors'];
@@ -515,7 +515,7 @@ class ActivityController extends Controller
             return redirect()->back()->withInput()->withErrors($errors);
         }
 
-        $responseIsProcess = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'. $author_id, [
+        $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. $author_id, [
             'is_process' => false,
         ]);
 
@@ -526,7 +526,7 @@ class ActivityController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/activity-docs/'.$id);
+        $response = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/activity-docs/'.$id);
 
         if ($response->json()['status'] == 400 || $response->json()['status'] == 500) {
             $errors = $response->json()['errors'];

@@ -17,7 +17,7 @@ class ProfileController extends Controller
     {
         $accessToken = session('user.access_token');
         $id          = session('user.id');
-        $response = Http::withToken($accessToken)->get("https://bepm.hanatekindo.com/api/v1/users/{$id}");
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL')."/users/{$id}");
 
         if ($response->failed()) {
             return redirect()->back()->withErrors('Failed to fetch user details.');
@@ -36,7 +36,7 @@ class ProfileController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'.$id ,[
+        $response = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'.$id ,[
             'name' => $request['name'],
         ]);
 
@@ -46,12 +46,12 @@ class ProfileController extends Controller
         $errorMessage = $response->json('message', 'Data Profile failed to edited. Please try again.');
         return redirect()->back()->withErrors(['error' => $errorMessage])->withInput();
     }
-    
+
     public function password()
     {
         $accessToken = session('user.access_token');
         $id          = session('user.id');
-        $response = Http::withToken($accessToken)->get("https://bepm.hanatekindo.com/api/v1/users/{$id}");
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL')."/users/{$id}");
 
         if ($response->failed()) {
             return redirect()->back()->withErrors('Failed to fetch user details.');
@@ -71,7 +71,7 @@ class ProfileController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/users/'.$id ,[
+        $response = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'.$id ,[
             'old_password'          => $request['password'],
             'new_password'          => $request['password_new'],
             'confirm_new_password'  => $request['password_new'],

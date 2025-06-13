@@ -14,7 +14,7 @@ class SearchController extends Controller
         $response = '';
 
         if(session('user.role') == 'SUPERADMIN'){
-            $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-docs?limit=1000');
+            $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-docs?limit=1000');
         } else {
             $project_id = "";
             for($i = 0; $i < count(session('user.project_id')); $i++){
@@ -25,7 +25,7 @@ class SearchController extends Controller
                 }
             }
 
-            $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-docs/search?project_id='.$project_id.'&limit=1000');
+            $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-docs/search?project_id='.$project_id.'&limit=1000');
         }
 
         if ($response->failed()) {

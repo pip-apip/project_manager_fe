@@ -9,7 +9,7 @@
     let id_activity = 0;
     let id_acttivity_doc = 0;
     let activity_data = [];
-    let baseUrl = "https://bepm.hanatekindo.com/api/v1/"
+    let baseUrl = env('API_BASE_URL')."/"
     let access_token = @json(session('user.access_token'));
     let statusDocForm = "";
 
@@ -35,9 +35,9 @@
             success: function (response) {
                 if(response.status === 200 ){
                     activity_data = response.data;
-                    console.log("activities_data",activity_data);
+                    // console.log("activities_data",activity_data);
                     let rows = "";
-    
+
                     $.each(response.data, function (index, activity) {
                         rows += `
                         <tr>
@@ -62,21 +62,21 @@
                             </td>
                         </tr>`;
                     });
-    
+
                     $("#table_body").html(rows);
                     let table1 = document.querySelector('#table1');
                     let dataTable = new simpleDatatables.DataTable(table1);
                 }else{
-                    console.log(response);
+                    // console.log(response);
                 }
                 $('#fullPageLoader').hide();
             },
             error: function (xhr) {
                 if (xhr.status === 401) {
-                    console.log("Token expired. Refreshing token...");
+                    // console.log("Token expired. Refreshing token...");
                     refreshToken();
                 } else {
-                    console.log(xhr);
+                    // console.log(xhr);
                 }
             }
         });
@@ -96,31 +96,31 @@
             success: function (response) {
                 if(response.status === 200){
                     // console.log(response);
-    
+
                     if (!response || !response.data) {
                         console.error("Invalid API response:", response);
                         return;
                     }
-    
+
                     let rows = ""; // Variable to store generated rows
                     rows += `<option value="#">Select Category</option>`;
-    
+
                     $.each(response.data, function (index, category) {
                         rows += `
                         <option value="${ category.id }">${ category.name }</option>`;
                     });
-    
+
                     $("#documentCat").html(rows);
                 }else{
-                    console.log(response);
+                    // console.log(response);
                 }
             },
             error: function (xhr) {
                 if (xhr.status === 401) {
-                    console.log("Token expired. Refreshing token...");
+                    // console.log("Token expired. Refreshing token...");
                     refreshToken();
                 } else {
-                    console.log(xhr);
+                    // console.log(xhr);
                 }
             }
         });
@@ -214,7 +214,7 @@
             contentType: 'application/json',
             success: function (response) {
                 $('#fullPageLoader').hide();
-                if(response.status === 400) { 
+                if(response.status === 400) {
                     let errors = response.errors;
 
                     $.each(errors, function (key, messages) {
@@ -271,7 +271,7 @@
             contentType: false,
             success: function (response) {
                 $('#fullPageLoader').hide();
-                if(response.status === 400) { 
+                if(response.status === 400) {
                     let errors = response.errors;
 
                     $.each(errors, function (key, messages) {
@@ -633,7 +633,7 @@
             contentType: false,
             success: function (response) {
                 $('#fullPageLoader').hide();
-                if(response.status === 400) { 
+                if(response.status === 400) {
                     let errors = response.errors;
 
                     $.each(errors, function (key, messages) {

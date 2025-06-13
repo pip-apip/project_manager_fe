@@ -120,7 +120,7 @@
 </div>
 
 <script>
-    console.log({!! json_encode($user) !!})
+    // console.log({!! json_encode($user) !!})
 </script>
 
 @endsection

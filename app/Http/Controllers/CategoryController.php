@@ -11,7 +11,7 @@ class CategoryController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/admin-doc-categories');
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/admin-doc-categories');
 
         if ($response->failed()) {
             return redirect()->back()->withErrors('Failed to fetch categories.');

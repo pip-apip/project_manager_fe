@@ -64,7 +64,7 @@ class ProjectController extends Controller
         }
 
         // $startTimeProject = microtime(true);
-        $responseProject = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/search', $params);
+        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects/search', $params);
         // $endTimeProject = microtime(true);
         // $responseTimeProject = $endTimeProject - $startTimeProject;
 
@@ -76,7 +76,7 @@ class ProjectController extends Controller
         $projects = $responseProject->json()['data'] ?? null;
 
         // $startTimeUser = microtime(true);
-        $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users?limit=1000');
+        $responseUser = Http::withToken($accessToken)->get(env('API_BASE_URL').'/users?limit=1000');
         // $endTimeUser = microtime(true);
         // $responseTimeUser = $endTimeUser - $startTimeUser;
 
@@ -87,7 +87,7 @@ class ProjectController extends Controller
         $users = $responseUser->json()['data'] ?? null;
 
         // $startTimeTeam = microtime(true);
-        $responseTeam = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/project-teams?limit=1000');
+        $responseTeam = Http::withToken($accessToken)->get(env('API_BASE_URL').'/project-teams?limit=1000');
         // $endTimeTeam = microtime(true);
         // $responseTimeTeam = $endTimeTeam - $startTimeTeam;
 
@@ -174,7 +174,7 @@ class ProjectController extends Controller
     {
         // dd(session('lastRoute'));
         $accessToken = session('user.access_token');
-        $responseProject = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/'.$id);
+        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects/'.$id);
 
         if ($responseProject->failed()) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
@@ -182,7 +182,7 @@ class ProjectController extends Controller
 
         $project = $responseProject->json()['data'][0];
 
-        $responseActivity = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/activities/search?project_id='.$id);
+        $responseActivity = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activities/search?project_id='.$id);
 
         if ($responseActivity->failed()) {
             return redirect()->back()->withErrors('Failed to fetch activity data.');
@@ -198,19 +198,19 @@ class ProjectController extends Controller
      */
     public function create(){
         $accessToken = session('user.access_token');
-        $responseCompanies = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/companies?limit=1000');
+        $responseCompanies = Http::withToken($accessToken)->get(env('API_BASE_URL').'/companies?limit=1000');
 
         if ($responseCompanies->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
         }
 
-        $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users');
+        $responseUser = Http::withToken($accessToken)->get(env('API_BASE_URL').'/users');
 
         if ($responseUser->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch user data.');
         }
 
-        $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users?limit=1000');
+        $responseUser = Http::withToken($accessToken)->get(env('API_BASE_URL').'/users?limit=1000');
 
         if ($responseUser->failed()) {
             return redirect()->back()->withErrors('Failed to fetch user data.');
@@ -238,7 +238,7 @@ class ProjectController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->post('https://bepm.hanatekindo.com/api/v1/projects', [
+        $response = Http::withToken($accessToken)->post(env('API_BASE_URL').'/projects', [
             'name' => $request->input('name'),
             'code' => $request->input('code'),
             'contract_number' => $request->input('contract_number'),
@@ -291,7 +291,7 @@ class ProjectController extends Controller
         // ]);
 
         $accessToken = session('user.access_token');
-        $file = $request->file('file');
+        // $file = $request->file('file');
         // dd($file);
 
         // Prepare the data
@@ -299,13 +299,14 @@ class ProjectController extends Controller
             'title' => $request->input('title'),
             'project_id' => $request->input('project_id'),
             'admin_doc_category_id' => $request->input('admin_doc_category_id'),
+            'file' => $request->input('uploaded_file_name'),
         ];
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '. $accessToken,
         ])
-        ->attach('file', file_get_contents($file), $file->getClientOriginalName())
-        ->post('https://bepm.hanatekindo.com/api/v1/admin-docs', $data);
+        // ->attach('file', file_get_contents($file), $file->getClientOriginalName())
+        ->post(env('API_BASE_URL').'/admin-docs', $data);
 
         // dd($response->json());
 
@@ -339,11 +340,11 @@ class ProjectController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $responseDelete = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/project-teams/'.$project_id);
+        $responseDelete = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/project-teams/'.$project_id);
         if ($responseDelete->json()['status'] == 400 || $responseDelete->json()['status'] == 200) {
 
             foreach ($teams as $key => $team) {
-                $response = Http::withToken($accessToken)->post('https://bepm.hanatekindo.com/api/v1/project-teams', [
+                $response = Http::withToken($accessToken)->post(env('API_BASE_URL').'/project-teams', [
                     'user_id' => $team['id'],
                     'project_id' => $project_id
                 ]);
@@ -379,20 +380,20 @@ class ProjectController extends Controller
     public function show(string $id)
     {
         $accessToken = session('user.access_token');
-        $responseProject = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/'.$id);
+        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects/'.$id);
 
         if ($responseProject->failed()) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
         }
 
-        $responseDocProject = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/admin-docs/search?project_id='.$id.'&limit=1000');
+        $responseDocProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/admin-docs/search?project_id='.$id.'&limit=1000');
         // dd($responseDocProject->json());
 
         if ($responseDocProject->failed()) {
             return redirect()->back()->withErrors('Failed to fetch doc project data.');
         }
 
-        $responseCategoryDocAdmin = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/admin-doc-categories/search?limit=1000');
+        $responseCategoryDocAdmin = Http::withToken($accessToken)->get(env('API_BASE_URL').'/admin-doc-categories/search?limit=1000');
 
         if ($responseCategoryDocAdmin->failed()) {
             return redirect()->back()->withErrors('Failed to fetch doc category of administration project data.');
@@ -416,7 +417,7 @@ class ProjectController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $responseProject = Http::withToken($accessToken)->get("https://bepm.hanatekindo.com/api/v1/projects/{$id}");
+        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL')."/projects/{$id}");
 
         if ($responseProject->failed()) {
             return redirect()->back()->withErrors('Failed to fetch category details.');
@@ -424,13 +425,13 @@ class ProjectController extends Controller
 
         $project = $responseProject->json()['data'][0];
 
-        $responseCompanies = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/companies?limit=1000');
+        $responseCompanies = Http::withToken($accessToken)->get(env('API_BASE_URL').'/companies?limit=1000');
 
         if ($responseCompanies->failed()) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
         }
 
-        $responseUser = Http::withToken($accessToken)->get('https://bepm.hanatekindo.com/api/v1/users?limit=1000');
+        $responseUser = Http::withToken($accessToken)->get(env('API_BASE_URL').'/users?limit=1000');
 
         if ($responseUser->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch user data.');
@@ -473,7 +474,7 @@ class ProjectController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->patch('https://bepm.hanatekindo.com/api/v1/projects/'. $id, $data);
+        $response = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/projects/'. $id, $data);
 
         if ($response->json()['status'] == 400) {
             $errors = $response->json()['errors'];
@@ -491,7 +492,7 @@ class ProjectController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $responseDelete = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/projects/'.$id);
+        $responseDelete = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/projects/'.$id);
 
         if ($responseDelete->json()['status'] !== 200) {
             $errors = $responseDelete->json()['errors'];
@@ -509,7 +510,7 @@ class ProjectController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->delete('https://bepm.hanatekindo.com/api/v1/admin-docs/'.$id);
+        $response = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/admin-docs/'.$id);
 
         if ($response->json()['status'] == 400 || $response->json()['status'] == 500) {
             $errors = $response->json()['errors'];

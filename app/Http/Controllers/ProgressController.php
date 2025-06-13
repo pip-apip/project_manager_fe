@@ -28,7 +28,7 @@ class ProgressController extends Controller
             'page' => $page,
         ];
 
-        $responseProject = Http::withToken($this->accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/search', $params);
+        $responseProject = Http::withToken($this->accessToken)->get(env('API_BASE_URL').'/projects/search', $params);
 
         if ($responseProject->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
@@ -80,7 +80,7 @@ class ProgressController extends Controller
         }
 
         foreach ($data as $item) {
-            $response = Http::withToken($this->accessToken)->post('https://bepm.hanatekindo.com/api/v1/activity-categories/' . $item['id'], [
+            $response = Http::withToken($this->accessToken)->post(env('API_BASE_URL').'/activity-categories/' . $item['id'], [
                 'progress' => $item['progress'] ?? null,
                 'note' => $item['note'] ?? null,
             ]);
@@ -127,7 +127,7 @@ class ProgressController extends Controller
                 );
             }
 
-            $response = $http->post('https://bepm.hanatekindo.com/api/v1/activity-categories/'. $id);
+            $response = $http->post(env('API_BASE_URL').'/activity-categories/'. $id);
 
             $responseData = $response->json();
 
@@ -158,13 +158,13 @@ class ProgressController extends Controller
      */
     public function show(string $id)
     {
-        $responseProject = Http::withToken($this->accessToken)->get('https://bepm.hanatekindo.com/api/v1/projects/'.$id);
+        $responseProject = Http::withToken($this->accessToken)->get(env('API_BASE_URL').'/projects/'.$id);
 
         if ($responseProject->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch project data.');
         }
 
-        $responseActivityCategory = Http::withToken($this->accessToken)->get('https://bepm.hanatekindo.com/api/v1/activity-categories/search?project_id='.$id);
+        $responseActivityCategory = Http::withToken($this->accessToken)->get(env('API_BASE_URL').'/activity-categories/search?project_id='.$id);
 
         if ($responseActivityCategory->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch activity category data.');
@@ -246,7 +246,7 @@ class ProgressController extends Controller
             }
         }
 
-        $response = $http->post('https://bepm.hanatekindo.com/api/v1/activity-categories/'. $id);
+        $response = $http->post(env('API_BASE_URL').'/activity-categories/'. $id);
 
         $responseData = $response->json();
 
