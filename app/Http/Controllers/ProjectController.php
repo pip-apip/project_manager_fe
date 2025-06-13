@@ -291,7 +291,7 @@ class ProjectController extends Controller
         // ]);
 
         $accessToken = session('user.access_token');
-        $file = $request->file('file');
+        // $file = $request->file('file');
         // dd($file);
 
         // Prepare the data
@@ -299,12 +299,13 @@ class ProjectController extends Controller
             'title' => $request->input('title'),
             'project_id' => $request->input('project_id'),
             'admin_doc_category_id' => $request->input('admin_doc_category_id'),
+            'file' => $request->input('uploaded_file_name'),
         ];
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '. $accessToken,
         ])
-        ->attach('file', file_get_contents($file), $file->getClientOriginalName())
+        // ->attach('file', file_get_contents($file), $file->getClientOriginalName())
         ->post(env('API_BASE_URL').'/admin-docs', $data);
 
         // dd($response->json());

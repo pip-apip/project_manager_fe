@@ -641,7 +641,7 @@
         tags = docData.tags || [];
         renderTags();
 
-        let path = env('API_BASE_URL_MAIN')."/storage/"
+        let path = "{{ env('API_BASE_URL_MAIN') }}/storage/";
         let html = '';
         let html_file_list = '';
         if (docData.files.length > 0) {

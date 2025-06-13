@@ -162,9 +162,6 @@ button:active {
                                             <a onclick="showDetail({{ json_encode($project) }})" class="btn btn-sm btn-info rounded-pill" data-bs-toggle="modal" data-bs-target="#detailModal">
                                                 <i class="fa-solid fa-ellipsis-vertical"></i>
                                             </a>
-                                            <button type="button" onclick="teamModal({{ $project['id'] }}, `{{ $project['name'] }}`, `{{ $project['project_leader_name'] }}`, {{ $project['project_leader_id'] }}, ``)" class="btn btn-sm btn-secondary rounded-pill" data-bs-toggle="modal" data-bs-target="#teamModal">
-                                                <i class="fa-solid fa-user-group"></i>
-                                            </button>
                                             <a href="{{ route('project.edit', $project['id']) }}" class="btn btn-sm btn-warning rounded-pill">
                                                 <i class="fa-solid fa-pen"></i>
                                             </a>
@@ -233,10 +230,10 @@ button:active {
                             <div class="form-group">
                                 <p class="form-control-static" id="director_name_detail"></p>
                             </div>
-                            <label><b> No.Telp Direktur : </b></label>
+                            {{-- <label><b> No.Telp Direktur : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="director_phone_detail"></p>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="col-sm-3">
                             <label><b> Nama Klien : </b></label>
@@ -247,10 +244,10 @@ button:active {
                             <div class="form-group">
                                 <p class="form-control-static" id="ppk_name_detail"></p>
                             </div>
-                            <label><b> Nilai Kontrak : </b></label>
+                            {{-- <label><b> Nilai Kontrak : </b></label>
                             <div class="form-group">
                                 <p class="form-control-static" id="project_value_detail"></p>
-                            </div>
+                            </div> --}}
                         </div>
                         <hr>
                         <div class="col-sm-5">
@@ -279,6 +276,9 @@ button:active {
                     </a>
                     <a class="btn btn-danger ml-1" id="activityButton">
                         <i class="fa-solid fa-chart-line"></i> Aktivitas Proyek
+                    </a>
+                    <a id="teamButton" onclick="teamModal({{ $project['id'] }}, `{{ $project['name'] }}`, `{{ $project['project_leader_name'] }}`, {{ $project['project_leader_id'] }}, ``)" class="btn btn-secondary ml-1" data-bs-toggle="modal" data-bs-target="#teamModal">
+                        <i class="fa-solid fa-user-group"></i> Team Proyek
                     </a>
                 </div>
             </div>
@@ -445,6 +445,7 @@ button:active {
     });
 
     function teamModal(id, projectName, projectLeader, projectLeaderId, status){
+        $('#closeDetailModal').click();
         // console.log(status)
         teams.forEach(function (team) {
             if (team.project_id == id) {
