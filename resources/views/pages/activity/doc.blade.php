@@ -241,6 +241,7 @@
     $activity = $data['activity'][0];
     $doc = $data['docActivity'];
     $categoryDoc = $data['categoryDoc'];
+    $activityTeam = $data['activityTeam'];
     $lastRoute = session()->get('lastRoute');
     $lastRoute = $lastRoute ? explode(',', $lastRoute) : [];
 @endphp
@@ -287,6 +288,37 @@
                             </div>
                             <div class="form-group col-md-10">
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" value="{{ $activity['title'] }}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Team Aktivitas</label>
+                                {{-- <br>
+                                <a href="" class="btn btn-warning btn-sm mt-4">Edit Team</a> --}}
+                            </div>
+                            <div class="form-group col-md-10">
+                                <div class="table-responsive" id="showTeam">
+                                    <table class="table table-striped" id="table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 5%">No</th>
+                                                <th style="width: 60%">Nama</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if ($activityTeam == null)
+                                                <tr>
+                                                    <td colspan="2" class="text-center">Tidak ada team aktivitas</td>
+                                                </tr>
+                                            @else
+                                            @foreach ($activityTeam as $team)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $team['user_name'] }}</td>
+                                                </tr>
+                                            @endforeach
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </form>
