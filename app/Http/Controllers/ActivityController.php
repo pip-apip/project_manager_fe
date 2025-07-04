@@ -258,10 +258,17 @@ class ActivityController extends Controller
             return redirect()->back()->withErrors('Failed to fetch doc category of activity data.');
         }
 
+        $responseActivityTeam = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-teams/search?activity_id='.$id.'&limit=1000');
+
+        if ($responseActivityTeam->failed()) {
+            return redirect()->back()->withErrors('Failed to fetch activity team data.');
+        }
+
         $data = [
             'activity'       => $responseActivity->json()['data'],
             'docActivity'    => $responseDocActivity->json()['data'],
-            'categoryDoc'   => $responseCategoryDocActivity->json()['data']
+            'categoryDoc'   => $responseCategoryDocActivity->json()['data'],
+            'activityTeam'   => $responseActivityTeam->json()['data'],
         ];
 
         // dd($data);
