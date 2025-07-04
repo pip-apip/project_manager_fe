@@ -65,8 +65,10 @@
                             @if(is_object($results) && method_exists($results, 'firstItem'))
                                 @foreach ($results as $user)
                                     @php
-                                        $status = '<span class="badge ' . (isset($user['token']) && $user['token'] ? 'bg-success' : 'bg-danger') . '">'
-                                                . (isset($user['token']) && $user['token'] ? 'Online' : 'Offline') . '</span>';
+                                        // $status = '<span class="badge ' . (isset($user['token']) && $user['token'] ? 'bg-success' : 'bg-danger') . '">'
+                                        //         . (isset($user['token']) && $user['token'] ? 'Online' : 'Offline') . '</span>';
+                                        $status = '<span class="badge ' . (isset($user['is_process']) && $user['is_process'] ? 'bg-success' : 'bg-danger') . '">'
+                                                . (isset($user['is_process']) && $user['is_process'] ? 'BERTUGAS' : 'IDLE') . '</span>';
                                     @endphp
                                     <tr>
                                         <td>{{ $user['username'] }}</td>

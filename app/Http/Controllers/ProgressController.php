@@ -20,6 +20,9 @@ class ProgressController extends Controller
      */
     public function index()
     {
+        if (!request()->has('search')) {
+            session()->forget('q');
+        }
         $page = request('page', 1);
         $perPage = request()->has('per_page') ? request('per_page') : 10;
 
@@ -27,6 +30,15 @@ class ProgressController extends Controller
             'limit' => $perPage,
             'page' => $page,
         ];
+
+        if (session('q')) {
+            $params['name'] = session('q');
+        }
+
+        if (session('user.role') != 'SUPERADMIN' && session('user.role') != 'ADMIN') {
+            $project_ids = session('user.project_id', []);
+            $params['id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
+        }
 
         $responseProject = Http::withToken($this->accessToken)->get(env('API_BASE_URL').'/projects/search', $params);
 
@@ -79,21 +91,27 @@ class ProgressController extends Controller
             $data[$id][$field] = $value;
         }
 
+        $finalResponse = [];
+
         foreach ($data as $item) {
             $response = Http::withToken($this->accessToken)->post(env('API_BASE_URL').'/activity-categories/' . $item['id'], [
-                'progress' => $item['progress'] ?? null,
+                'value' => $item['progress'] ?? null,
                 'note' => $item['note'] ?? null,
             ]);
 
             if ($response->json()['status'] !== 200) {
                 $failedCount++;
             }
+            $finalResponse[] = [
+                'id' => $item['id'],
+                'response' => $response->json(),
+            ];
         }
 
         if ($failedCount > 0) {
             return redirect()->back()->withErrors('Failed to update progress data.');
         } else {
-            return redirect()->route('progress.index')->with('success', 'Progress data updated successfully.');
+            return redirect()->back()->with('success', 'Progress data updated successfully.');
         }
     }
 
@@ -159,6 +177,12 @@ class ProgressController extends Controller
     public function show(string $id)
     {
         $responseProject = Http::withToken($this->accessToken)->get(env('API_BASE_URL').'/projects/'.$id);
+
+        if (session('user.role') !== 'SUPERADMIN' && session('user.role') !== 'ADMIN') {
+            if ($responseProject->json()['data'][0]['project_leader_id'] !== session('user.id')) {
+                return redirect()->back()->with('error', 'You do not have permission to view this project.');
+            }
+        }
 
         if ($responseProject->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch project data.');

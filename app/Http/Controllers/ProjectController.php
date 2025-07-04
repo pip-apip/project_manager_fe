@@ -58,7 +58,7 @@ class ProjectController extends Controller
             $params['end_date'] = date('Y-m-d', strtotime($end_date));
         }
 
-        if (session('user.role') != 'SUPERADMIN') {
+        if (session('user.role') != 'SUPERADMIN' && session('user.role') != 'ADMIN') {
             $project_ids = session('user.project_id', []);
             $params['id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
         }
@@ -425,6 +425,10 @@ class ProjectController extends Controller
 
         $project = $responseProject->json()['data'][0];
 
+        if($project['project_leader_id'] !== session('user.id') && session('user.role') !== 'SUPERADMIN'){
+            return redirect()->back()->with('error', 'You cannot edit this project because you are the project leader.');
+        }
+
         $responseCompanies = Http::withToken($accessToken)->get(env('API_BASE_URL').'/companies?limit=1000');
 
         if ($responseCompanies->failed()) {
@@ -491,6 +495,18 @@ class ProjectController extends Controller
     public function destroy(string $id)
     {
         $accessToken = session('user.access_token');
+
+        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL')."/projects/{$id}");
+
+        if ($responseProject->failed()) {
+            return redirect()->back()->with('error', 'Failed to fetch category details.');
+        }
+
+        $project = $responseProject->json()['data'][0];
+
+        if($project['project_leader_id'] !== session('user.id') || session('user.role') !== 'SUPERADMIN'){
+            return redirect()->back()->with('error', 'You cannot delete this project because you are the project leader.');
+        }
 
         $responseDelete = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/projects/'.$id);
 

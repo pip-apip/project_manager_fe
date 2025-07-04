@@ -57,7 +57,9 @@
                                     <th width="30%">PL</th>
                                     <th>Paket</th>
                                     <th width="15%" class="text-center">Progress</th>
+                                    @if (session('user.role') === 'SUPERADMIN' || session('user.role') === 'ADMIN' || session('user.project_leader'))
                                     <th width="10%" class="text-center">Aksi</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody id="table_body">
@@ -77,12 +79,19 @@
                                         <td>{{ $project['project_leader_name'] }}</td>
                                         <td>{{ $project['name'] }}</td>
                                         <td class="text-center">{!! $status !!}</td>
-
-                                        <td class="text-center">
-                                            <a href="{{ route('progress.project', $project['id']) }}" class="btn btn-sm btn-warning rounded-pill">
-                                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                                            </a>
-                                        </td>
+                                        @if (session('user.role') === 'SUPERADMIN' || session('user.role') === 'ADMIN' || session('user.project_leader'))
+                                            @if ($project['project_leader_id'] === session('user.id') || session('user.role') === 'SUPERADMIN' || session('user.role') === 'ADMIN')
+                                            <td class="text-center">
+                                                <a href="{{ route('progress.project', $project['id']) }}" class="btn btn-sm btn-warning rounded-pill">
+                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                </a>
+                                            </td>
+                                            @else
+                                            <td class="text-center">
+                                                <span>-</span>
+                                            </td>
+                                            @endif
+                                        @endif
                                     </tr>
                                 @endforeach
                             @else

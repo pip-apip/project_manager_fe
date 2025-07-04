@@ -95,7 +95,7 @@ class CategoryAdmController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->post(env('API_BASE_URL').'/admin-doc-categories?limit=1000', [
+        $response = Http::withToken($accessToken)->post(env('API_BASE_URL').'/admin-doc-categories', [
             'name' => $request->input('name'),
         ]);
 

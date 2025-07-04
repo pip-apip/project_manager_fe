@@ -14,7 +14,7 @@
                             <h1>Detail <span class="d-none d-md-inline-block">Proyek</span></h1>
                         </div>
                         <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
-                            <a href="{{ route(session('lastRoute')) }}" class="btn btn-secondary btn-sm">
+                            <a href="{{ route('ca.project') }}" class="btn btn-secondary btn-sm">
                                 <i class="fa-solid fa-angle-left"></i> <span class="d-none d-md-inline-block">Kembali</span>
                             </a>
                         </div>
@@ -76,10 +76,10 @@
                         <div class="card-header">
                             <div class="row">
                                 <div class="col-sm-8 col-8">
-                                    <h1 class="card-title">Aktivitas Proyek</h1>
+                                    <h1 class="card-title">CA Proyek</h1>
                                 </div>
                                 <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
-                                    <a href="{{ route('activity.create', ['project_id' => $project['id']]) }}" class="btn btn-success btn-sm">
+                                    <a href="{{ route('ca.create', ['project_id' => $project['id']]) }}" class="btn btn-success btn-sm">
                                         <i class="fa-solid fa-plus"></i> <span class="d-none d-md-inline-block">Tambah</span>
                                     </a>
                                 </div>
@@ -90,51 +90,31 @@
                                 <table class="table table-striped" id="table1">
                                     <thead>
                                         <tr>
-                                            <th width="12%" class="text-center">Mulai</th>
-                                            <th width="12%" class="text-center">Selesai</th>
-                                            <th>Catatan Aktivitas</th>
-                                            <th width="10%" class="text-center">Status</th>
-                                            <th width="18%" class="text-center">Aksi</th>
+                                            <th width="12%" class="text-center">Tanggal</th>
+                                            <th width="12%" class="text-center">Pemohon</th>
+                                            <th>Klasifikasi</th>
+                                            <th>Keterangan</th>
+                                            <th width="10%" class="text-center">Grand Total</th>
+                                            <th width="18%" class="text-center">Bukti Dokumen</th>
                                         </tr>
                                     </thead>
                                     <tbody id="table">
-                                    @if ($activities !== [])
-                                        @foreach ($activities as $act)
-                                        @php
-                                            $badge_bg = '';
-                                            if($act['status'] == 'DONE'){
-                                                $badge_bg = 'bg-success';
-                                            }else if($act['status'] == 'ON PROGRESS'){
-                                                $badge_bg = 'bg-info';
-                                            }
-                                        @endphp
+                                    @if ($caData !== [])
+                                        @foreach ($caData as $ca)
                                         <tr>
-                                            <td class="text-center">{{ \Carbon\Carbon::parse($act['start_date'])->translatedFormat('d-m-Y') }}</td>
-                                            <td class="text-center">{{ \Carbon\Carbon::parse($act['end_date'])->translatedFormat('d-m-Y') }}</td>
-                                            <td>{{ $act['title'] }}</td>
+                                            <td class="text-center">{{ \Carbon\Carbon::parse($ca['tanggal_ca'])->translatedFormat('d-m-Y') }}</td>
+                                            <td>{{ $ca['nama_pemohon'] }}</td>
+                                            <td>{{ $ca['klasifikasi'] }}</td>
+                                            <td>{{ $ca['keterangan'] }}</td>
+                                            <td>{{ $ca['total_ca'] }}</td>
                                             <td class="text-center">
-                                                @if(session('user.role') == 'SUPERADMIN')
-                                                <button class="badge {{ $badge_bg }} border-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    {{ $act['status'] ?? 'Undefined' }}
-                                                </button>
-                                                <div class="dropdown-menu" style="">
-                                                    <button class="dropdown-item {{ $act['status'] == 'DONE' ? 'active' : '' }}" onclick="changeStatus({{ $act['id'] }}, 'DONE')">DONE</button>
-                                                    <button class="dropdown-item {{ $act['status'] == 'ON PROGRESS' ? 'active' : '' }}" onclick="changeStatus({{ $act['id'] }}, 'ON PROGRESS')">ON PROGRESS</button>
-                                                </div>
-                                                @else
-                                                <span class="badge {{ $badge_bg }}">
-                                                    {{$act['status']}}
-                                                </span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                <a href="{{ route('activity.edit', $act['id']) }}" class="btn btn-sm btn-warning rounded-pill">
+                                                <a href="{{ route('activity.edit', $ca['id']) }}" class="btn btn-sm btn-warning rounded-pill">
                                                     <i class="fa-solid fa-pen"></i>
                                                 </a>
-                                                <a href="javascript:void(0)" class="btn btn-sm btn-danger rounded-pill" onclick="confirmDelete('{{ route('activity.destroy', $act['id']) }}')">
+                                                <a href="javascript:void(0)" class="btn btn-sm btn-danger rounded-pill" onclick="confirmDelete('{{ route('activity.destroy',$ca['id']) }}')">
                                                     <i class="fa-solid fa-trash"></i>
                                                 </a>
-                                                <a href="{{ route('activity.doc', $act['id']) }}" class="btn btn-sm btn-info rounded-pill">
+                                                <a href="{{ route('activity.doc', $ca['id']) }}" class="btn btn-sm btn-info rounded-pill">
                                                     <i class="fa-solid fa-file"></i>
                                                 </a>
                                             </td>
@@ -142,7 +122,7 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td colspan="5" class="text-center">Tidak ada aktivitas</td>
+                                            <td colspan="6" class="text-center">Tidak ada CA</td>
                                         </tr>
                                     @endif
                                     </tbody>
@@ -162,45 +142,8 @@
 
 <script>
     let projectData = {!! json_encode($project) !!}
-    let activityList = {!! json_encode($activities) !!}
-    let lastPage = {!! json_encode(session('lastUrl') ) !!}
 
-    function changeStatus(id, status){
-        $.ajax({
-            url: "{{ env('API_BASE_URL') }}/activities/" + id,
-            type: "PATCH",
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': 'Bearer ' + @json(session('user.access_token')),
-            },
-            data: {
-                status: status
-                // _token: "{{ csrf_token() }}"
-            },
-            success: function (response) {
-                // console.log(response);
-                if (response.status == 200) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                }
-            }
-        })
-    }
+    let lastPage = {!! json_encode(session('lastUrl') ) !!}
 
 </script>
 @endsection

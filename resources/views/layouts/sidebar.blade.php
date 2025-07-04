@@ -35,16 +35,18 @@
                     </a>
                 </li>
 
-            @if(session('user.role') === 'SUPERADMIN')
+            @if(session('user.role') === 'SUPERADMIN' || session('user.role') === 'ADMIN' || session('user.project_leader'))
                 <li class="sidebar-item {{ $title == 'categoryAct' || $title == 'categoryAdm' ? 'active' : ''  }} has-sub">
                     <a href="#" class='sidebar-link'>
                         <i class="fa-solid fa-list"></i>
                         <span>Kategori</span>
                     </a>
                     <ul class="submenu {{ $title == 'categoryAct' || $title == 'categoryAdm' ? 'active' : '' }}">
-                        <li class="submenu-item {{ $title == 'categoryAdm' ? 'active' : ''  }}">
-                            <a href="{{ route('categoryAdm.index') }}">Administrasi</a>
-                        </li>
+                        @if (session('user.role') === 'SUPERADMIN' || session('user.role') === 'ADMIN')
+                            <li class="submenu-item {{ $title == 'categoryAdm' ? 'active' : ''  }}">
+                                <a href="{{ route('categoryAdm.index') }}">Administrasi</a>
+                            </li>
+                        @endif
                         <li class="submenu-item {{ $title == 'categoryAct' ? 'active' : ''  }}">
                             <a href="{{ route('categoryAct.index') }}">Aktivitas</a>
                         </li>
@@ -68,13 +70,6 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ $title == 'progress' ? 'active' : ''  }} " style="display: none;">
-                    <a href="{{ route('progress.index') }}" class='sidebar-link'>
-                        <i class="fa-solid fa-hourglass-half"></i>
-                        <span>Progress</span>
-                    </a>
-                </li>
-
                 <li class="sidebar-item {{ $title == 'activity' ? 'active' : ''  }} ">
                     <a href="{{ route('activity.index') }}" class='sidebar-link'>
                         <i class="fa-solid fa-chart-line"></i>
@@ -82,14 +77,55 @@
                     </a>
                 </li>
 
-            @if(session('user.role') === 'SUPERADMIN')
+            {{-- @if(session('user.role') === 'SUPERADMIN')
+                @php
+                    $lastRoute = session()->get('lastRoute');
+                    $lastRoute = $lastRoute ? explode(',', $lastRoute) : [];
+                    $lastRoute = $lastRoute[0] ? explode('.', $lastRoute[0]) : [];
+                    // if($lastRoute[1] == "create") {
+                    //     $url = url()->current();
+                    //     $url = explode('/', $url);
+                    //     // $lastRoute[1] = $url[3];
+                    // }
+                    // if($lastRoute[1] == "project") {
+                    //     $title = 'caProject';
+                    // } else {
+                    //     $title = 'ca';
+                    // }
+
+                @endphp --}}
+                {{-- {{ json_encode($lastRoute   ) }} --}}
+                @if (session('user.role') === 'SUPERADMIN' || session('user.role') === 'ADMIN' || session('user.project_leader'))
+                <li class="sidebar-item {{ $title == 'progress' ? 'active' : ''  }} ">
+                    <a href="{{ route('progress.index') }}" class='sidebar-link'>
+                        <i class="fa-solid fa-signal"></i>
+                        <span>Progress</span>
+                    </a>
+                </li>
+                @endif
+                @if (session('user.role') === 'SUPERADMIN' || session('user.role') === 'ADMIN')
+                <li class="sidebar-item {{ $title == 'ca' || $title == 'caProject' ? 'active' : ''  }} has-sub" style="display: none">
+                    <a href="#" class='sidebar-link'>
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>CA</span>
+                    </a>
+                    <ul class="submenu {{ $title == 'ca' || $title == 'caProject' ? 'active' : '' }}">
+                        <li class="submenu-item {{ $title == 'ca' ? 'active' : ''  }}">
+                            <a href="{{ route('ca.index') }}">Pengajuan</a>
+                        </li>
+                        <li class="submenu-item {{ $title == 'caProject' ? 'active' : ''  }}">
+                            <a href="{{ route('ca.project') }}">Pemakaian</a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="sidebar-item {{ $title == 'user' ? 'active' : ''  }} ">
                     <a href="{{ route('user.index') }}" class='sidebar-link'>
                         <i class="fa-solid fa-users"></i>
                         <span>Pengguna</span>
                     </a>
                 </li>
-            @endif
+                @endif
+            {{-- @endif --}}
 
                 {{-- <li class="sidebar-item">
                     <a class="sidebar-link" onclick="document.getElementById('logout-form').submit();" style="cursor: pointer;">
