@@ -43,7 +43,7 @@ class AuthController extends Controller
                 'currentRoute' => 'home',
             ]);
 
-            $responseTeams = Http::withToken($response->json('data.access_token'))->get(env('API_BASE_URL').'/teams/search?user_id='.$response->json('data.id').'&limit=1000');
+            $responseTeams =Http::withToken($response->json('data.access_token'))->get(env('API_BASE_URL').'/project-teams/search?user_id='.$response->json('data.id').'&limit=1000');
 
             if($responseTeams->json('data')){
                 $teams = $responseTeams->json('data');
@@ -64,10 +64,13 @@ class AuthController extends Controller
                 foreach ($projects as $project) {
                     $projectIds[] = $project['id'];
                 }
-
+                session(['user.project_leader' => true]);
                 session(['user.project_id' => array_merge(session('user.project_id'), $projectIds)]);
+                session(['user.project_leader_id' => $projectIds]);
             } else {
+                session(['user.project_leader' => false]);
                 session(['user.project_id' => []]);
+                session(['user.project_leader_id' => []] );
             }
 
             return redirect()->route('home')->with('success', 'Login successful.');

@@ -66,9 +66,6 @@ class ActivityController extends Controller
 
         $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activities/search', $params);
 
-        // tag all
-        // https://bepm.hanatekindo.com/api/v1/activities/search?tags='possimus', 'asdasd'&description='possimus', 'asdasd'
-
         if ($response->failed()) {
             return redirect()->back()->withErrors('Failed to fetch activities.');
         }
@@ -181,7 +178,8 @@ class ActivityController extends Controller
      */
     public function store(Request $request)
     {
-        if($this->isProcess){
+
+        if($this->isProcess && session('user.role') !== 'SUPERADMIN'){
             return redirect()->route('activity.index')->with('error', 'Anda memiliki proses aktivitas yang sedang berlangsung. Silakan selesaikan terlebih dahulu.');
         }
         $activity_teams = json_decode($request->input('activityTeam'), true);

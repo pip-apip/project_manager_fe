@@ -37,7 +37,7 @@ class AuthMiddleware
 
         $currentRoute = Route::currentRouteName();
         $id = request()->route('id');
-        $currentRoute .= $id ? ', ' . $id : '';
+        $currentRoute .= $id ? ',' . $id : '';
 
         $previousRoute = session('currentRoute');
 

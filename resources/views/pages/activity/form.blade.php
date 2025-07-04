@@ -286,7 +286,7 @@
 
 <script>
     $(document).ready(function() {
-        // console.log({!! json_encode($projects) !!})
+        // console.log({!! json_encode(session('user')) !!})
         $('form').on('submit', function() {
             // $('#fullPageLoader').show();
             buttonLoadingStart('submitButton');
@@ -325,7 +325,7 @@
 
     function showCategoryList(project_id) {
         $.ajax({
-            url: env('API_BASE_URL') + "/activity-categories/search?project_id=" + project_id + ",0",
+            url: "{{ env('API_BASE_URL') }}/activity-categories/search?project_id=" + project_id + ",0",
             headers: {
                 'Accept': 'application/json',
                 'Authorization': 'Bearer ' + access_token,

@@ -110,6 +110,17 @@
             <div id="main-content">
                 @yield('content')
 
+                <div id="hoverTooltip" style="
+                    position: absolute;
+                    background: #333;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    pointer-events: none;
+                    display: none;
+                    z-index: 1000;">
+                </div>
                 <footer>
                     <div class="footer clearfix mb-0 text-muted">
                         <div class="float-start">
@@ -126,6 +137,27 @@
 
     <script>
         let oldButtonClass = "";
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const tooltip = document.getElementById('hoverTooltip');
+            const elements = document.querySelectorAll('[data-tooltip]');
+
+            elements.forEach(el => {
+                el.addEventListener('mouseenter', (e) => {
+                    tooltip.innerText = el.getAttribute('data-tooltip');
+                    tooltip.style.display = 'block';
+                });
+
+                el.addEventListener('mousemove', (e) => {
+                    tooltip.style.left = `${e.pageX + 10}px`;
+                    tooltip.style.top = `${e.pageY - 30}px`;
+                });
+
+                el.addEventListener('mouseleave', () => {
+                    tooltip.style.display = 'none';
+                });
+            });
+        });
 
         function buttonLoadingStart(idButton){
             oldButtonClass = $('#' + idButton).html();

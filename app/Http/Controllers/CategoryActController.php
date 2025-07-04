@@ -12,10 +12,14 @@ class CategoryActController extends Controller
     /**
      * Display a listing of the resource.
      */
+    private $project_leader_id;
+
     public function __construct()
     {
-        //
-
+        $this->project_leader_id = [];
+        if (session('user.project_leader')) {
+            $this->project_leader_id = session('user.project_leader_id', []);
+        }
     }
 
     public function index()
@@ -33,18 +37,36 @@ class CategoryActController extends Controller
 
         $accessToken = session('user.access_token');
 
-        $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-categories/search', [
-            'name' => session('q'),
+        $params = [
             'limit' => $perPage,
             'page' => $page,
-            'project_id' => session('project_id'),
-        ]);
+        ];
+        $paramsProject = '';
+
+        if (session('user.project_leader')) {
+            $project_ids = $this->project_leader_id;
+            $params['project_id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
+            $paramsProject = '/search?id='.$params['project_id'] ?? '';
+        }
+
+        if (session('project_id')) {
+            $params['project_id'] = session('project_id');
+        }
+
+        if (session('user.role') == 'SUPERADMIN' || session('user.role') == 'ADMIN') {
+            unset($params['project_id']);
+        }
+
+        if (session('q')) {
+            $params['name'] = session('q');
+        }
+
+        $response = Http::withToken($accessToken)->get(env('API_BASE_URL').'/activity-categories/search', $params);
 
         if ($response->failed()) {
             return redirect()->back()->withErrors('Failed to fetch categories.');
         }
-
-        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects');
+        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects'. $paramsProject . '?limit=100');
 
         if ($responseProject->json()['status'] !== 200) {
             return redirect()->back()->withErrors('Failed to fetch categories.');
@@ -93,10 +115,21 @@ class CategoryActController extends Controller
     {
         $accessToken = session('user.access_token');
 
-        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects');
+        $paramsProject = '?';
+        if (session('user.project_leader')) {
+            $project_ids = is_array($this->project_leader_id) ? implode(',', $this->project_leader_id) : $this->project_leader_id;
+            $paramsProject = '/search?id='.$project_ids.'&';
+        }
+        if (session('user.role') == 'SUPERADMIN' || session('user.role') == 'ADMIN') {
+            $paramsProject = '?';
+        } elseif (!session('user.project_leader')) {
+            return redirect()->back()->with('error', 'You do not have permission to create a category activity.');
+        }
+
+        $responseProject = Http::withToken($accessToken)->get(env('API_BASE_URL').'/projects'. $paramsProject . 'limit=100');
 
         if ($responseProject->json()['status'] !== 200) {
-            return redirect()->back()->withErrors('Failed to fetch categories.');
+            return redirect()->back()->with('error','Failed to fetch categories.');
         }
 
         $projects = $responseProject->json()['data'] ?? null;

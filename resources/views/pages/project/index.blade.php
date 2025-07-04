@@ -61,11 +61,14 @@ button:active {
                         <div class="col-sm-8 col-8">
                             <h1>Daftar Proyek</h1>
                         </div>
+                        @if (session('user.project_leader') || session('user.role') == 'SUPERADMIN')
                         <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
                             <a href="{{ route('project.create') }}" class="btn btn-success btn-sm">
                                 <i class="fa-solid fa-plus"></i> <span class="d-none d-md-inline-block">Tambah</span>
                             </a>
                         </div>
+                        @else
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -98,7 +101,7 @@ button:active {
                                 </div>
                                 <div class="col-lg-5 col-5">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" name="q" value="{{ session()->has('q') ? session('q') : '' }}" placeholder="Ketik Nama Aktivitias & Klik Enter ..." onkeydown="if (event.key === 'Enter') { event.preventDefault(); this.form.submit(); }">
+                                        <input type="text" class="form-control" name="q" value="{{ session()->has('q') ? session('q') : '' }}" placeholder="Ketik Nama Proyek & Klik Enter ..." onkeydown="if (event.key === 'Enter') { event.preventDefault(); this.form.submit(); }">
                                         <button class="btn btn-primary" type="submit" id="button-addon1"><i class="fa-solid fa-magnifying-glass"></i></button>
                                     </div>
                                 </div>
@@ -136,14 +139,18 @@ button:active {
                                     else if($project['status'] == 'CLOSED'){
                                         $badge_bg = 'bg-success';
                                     }
+
+                                    $project_leader_status = session('user.id') == $project['project_leader_id'] ? true : false;
+                                    $tooltip = $project_leader_status ? 'Status = Proyek Leader' : 'Status = Team Proyek';
+                                    $tooltipAttr = session('user.role') == 'SUPERADMIN' || session('user.role') == 'ADMIN' ? '' : 'data-tooltip="' . $tooltip . '"';
                                 @endphp
-                                    <tr>
+                                    <tr {!! $tooltipAttr !!}>
                                         <td class="text-center">{{ \Carbon\Carbon::parse($project['start_date'])->translatedFormat('d-m-Y') }}</td>
                                         <td class="text-center">{{ \Carbon\Carbon::parse($project['end_date'])->translatedFormat('d-m-Y') }}</td>
                                         <td>{{ $project['name'] }}</td>
                                         <td>{{ $project['company_name'] }}</td>
                                         <td class="text-center">
-                                            @if(session('user.role') == 'SUPERADMIN')
+                                            @if(session('user.role') == 'SUPERADMIN' || session('user.role') == 'ADMIN' || $project_leader_status)
                                             <button class="badge {{ $badge_bg }} border-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 {{ $project['status'] ?? 'Undefined' }}
                                             </button>
@@ -162,12 +169,20 @@ button:active {
                                             <a onclick="showDetail({{ json_encode($project) }})" class="btn btn-sm btn-info rounded-pill" data-bs-toggle="modal" data-bs-target="#detailModal">
                                                 <i class="fa-solid fa-ellipsis-vertical"></i>
                                             </a>
+                                            @if ($project_leader_status || session('user.role') == 'SUPERADMIN' || session('user.role') == 'ADMIN')
                                             <a href="{{ route('project.edit', $project['id']) }}" class="btn btn-sm btn-warning rounded-pill">
                                                 <i class="fa-solid fa-pen"></i>
                                             </a>
                                             <button class="btn btn-sm btn-primary rounded-pill" onclick="confirmDelete('{{ route('project.destroy', $project['id']) }}')">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
+                                            @endif
+                                            <a id="teamButton" onclick="teamModal({{ $project['id'] }}, `{{ $project['name'] }}`, `{{ $project['project_leader_name'] }}`, {{ $project['project_leader_id'] }}, ``)" class="btn btn-sm btn-secondary rounded-pill" data-bs-toggle="modal" data-bs-target="#teamModal">
+                                                <i class="fa-solid fa-user-group"></i>
+                                            </a>
+                                            {{-- <a id="teamButton" onclick="teamModal({{ $project['id'] }}, `{{ $project['name'] }}`, `{{ $project['project_leader_name'] }}`, {{ $project['project_leader_id'] }}, ``)" class="btn btn-secondary ml-1" data-bs-toggle="modal" data-bs-target="#teamModal">
+                                                <i class="fa-solid fa-user-group"></i>
+                                            </a> --}}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -271,14 +286,11 @@ button:active {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a class="btn btn-info ml-1" id="docButton">
+                    <a class="btn btn-info ml-1" id="docButton" style="display: none">
                         <i class="fa-solid fa-file"></i> Dokumen Proyek
                     </a>
                     <a class="btn btn-danger ml-1" id="activityButton">
                         <i class="fa-solid fa-chart-line"></i> Aktivitas Proyek
-                    </a>
-                    <a id="teamButton" onclick="teamModal({{ $project['id'] }}, `{{ $project['name'] }}`, `{{ $project['project_leader_name'] }}`, {{ $project['project_leader_id'] }}, ``)" class="btn btn-secondary ml-1" data-bs-toggle="modal" data-bs-target="#teamModal">
-                        <i class="fa-solid fa-user-group"></i> Team Proyek
                     </a>
                 </div>
             </div>
@@ -390,6 +402,8 @@ button:active {
     <span class="closeImage" onclick="closeModernModal()">&times;</span>
 </div>
 
+
+
 <script src="{{ asset('assets/vendors/simple-datatables/simple-datatables.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -496,7 +510,9 @@ button:active {
                 </button>
             `;
         }
-        $('#footerTeam').html(footerHtml);
+        if(@json(session('user.id')) === projectLeaderId || @json(session('user.role')) === 'SUPERADMIN'){
+            $('#footerTeam').html(footerHtml);
+        }
         $('#userSearch').val('');
         $('#teamSearch').val('');
     }
@@ -727,7 +743,7 @@ button:active {
     }
 
     function showDetail(data){
-        // console.log(data);
+        console.log(data);
         let onclickDelete = `confirmDelete("` + `{{ url('project/destroy/${data.id}') }} ")`;
         // let onclickDelete = `confirmDelete("` + `{{ route('project.destroy', ':id') }}`.replace(':id', data.id) + ` ")`;
 
@@ -747,7 +763,13 @@ button:active {
         $("#end_project_detail").text(dateFormat(data.end_date));
         $("#maintenance_project_detail").text(dateFormat(data.maintenance_date));
 
-        $("#docButton").attr("href", "{{ route('project.doc', ':id') }}".replace(':id', data.id));
+        if({{ session('user.id') }} === data.project_leader_id || {{ session('user.role') }} === 'SUPERADMIN'){
+            console.log({{ session('user.id') }})
+            $("#docButton").attr("href", "{{ route('project.doc', ':id') }}".replace(':id', data.id));
+            $('#docButton').show();
+        }else{
+            $('#docButton').hide();
+        }
         $("#activityButton").attr("href", "{{ route('project.activity', ':id') }}".replace(':id', data.id));
         // $("#deleteButton").attr("onclick", onclickDelete);
     }

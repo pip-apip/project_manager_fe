@@ -161,6 +161,48 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <form class="form form-vertical">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Nama Proyek</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" value="{{ $project['name'] }}" readonly />
+                            </div>
+                            {{-- <div class="col-md-2">
+                                <label>Tanggal</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" value="{{ \Carbon\Carbon::parse($activity['start_date'])->translatedFormat('d-m-Y') }}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Kategori Aktivitas</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" value="{{ $activity['activity_category_name'] }}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Catatan Aktivitas</label>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" value="{{ $activity['title'] }}" readonly />
+                            </div> --}}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="page-heading">
+    <div class="page-content">
+        <section id="basic-horizontal-layouts">
+            <div class="card">
+                {{-- <div class="card-header">
+                    <h1>Progress <span class="d-none d-md-inline-block">Proyek</span></h1>
+                </div> --}}
+                <div class="card-body">
                     <div class="row">
                         <form action="{{ route('progress.store', $project['id']) }}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -182,7 +224,7 @@
                                         @else
                                         @foreach ($activityCategory as $cat)
                                             <tr>
-                                                <td>{{ $cat['name'] }}</td>
+                                                <td onclick="detailActivity({{ $cat['id'] }})" style="cursor: pointer">{{ $cat['name'] }}</td>
                                                 <td class="text-center">
                                                     <div class="d-flex align-items-center">
                                                         <input type="text" class="form-control text-center" id="progress_{{ $cat['id'] }}" name="progress_{{ $cat['id'] }}" value="{{ $cat['value'] ?? '0' }}" autocomplete="off">
@@ -276,7 +318,72 @@
     </div>
 </div>
 
+<div class="modal fade text-left w-100" id="detailActivityModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel33"
+    data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel33">Detail Aktivitas</h4>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" id="closeDetailActivityModal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div>
+                <div class="modal-body">
+                    <input type="text" id="activity_id" style="display: none">
+                    <table class="table table-striped" id="table">
+                        <thead>
+                            <td>Aktivitas</td>
+                            <td>Tanggal</td>
+                            <td class="text-center">Dokumen</td>
+                        </thead>
+                        <tbody id="tableActivityDetail">
+
+                        </tbody>
+                    </table>
+                </div>
+                {{-- <div class="modal-footer">
+                    <button type="button" class="btn btn-danger ml-1" id="save-button" style="display: none" onclick="saveImage()">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan
+                    </button>
+                    <button type="button" class="btn btn-success ml-1" id="addButton">
+                        <i class="fa-solid fa-plus"></i> Tambah Dokumen
+                    </button>
+                </div> --}}
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+@if(session()->has('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '{{ session()->get('success') }}',
+            showConfirmButton: false,
+            timer: 1500
+        }).then(() => {
+            $('#fullPageLoader').hide();
+        });
+    </script>
+@endif
+
+@if(session()->has('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: '{{ session()->get('error') }}',
+            showConfirmButton: false,
+            timer: 1500
+        }).then(() => {
+            $('#fullPageLoader').hide();
+        });
+    </script>
+@endif
 
 <script>
     let idActivityOpened = null;
@@ -293,7 +400,7 @@
         $('#activity_id').val(id);
         activity = activities.find(activity => activity.id === id);
 
-        let path = env('API_BASE_URL_MAIN')."/storage/"
+        let path = "{{ env('API_BASE_URL_MAIN') }}/storage/"
         images = activity.images || [];
 
         let html = '';
@@ -459,6 +566,50 @@
                 alert('Failed to upload files. Please try again.');
             }
         });
+    }
+
+    function detailActivity(id) {
+        let token = @json(session('user.access_token'));
+        $('#activity_id').val(id);
+        $('#tableActivityDetail').empty();
+        $.ajax({
+            url: "{{ env('API_BASE_URL') }}/activities/search?activity_category_id=" + id,
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            success: function(response) {
+                let html = '';
+                if (response.data.length > 0) {
+                    response.data.forEach(activities => {
+                        let link = `{{ route('activity.doc', ':id') }}`.replace(':id', activities.id);
+                        html += `
+                            <tr>
+                                <td>${activities.title}</td>
+                                <td>${activities.created_at ? new Date(activities.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-info btn-sm" onclick="window.open('${link}', '_blank')">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    html = `
+                        <tr>
+                            <td colspan="3" class="text-center">Tidak ada data</td>
+                        </tr>
+                    `;
+                }
+                $('#tableActivityDetail').html(html);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching activity details:', error);
+            }
+        })
+        $('#detailActivityModal').modal('show');
     }
 </script>
 

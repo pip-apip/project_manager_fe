@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use App\Http\Controllers\CharteredAccountantController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategoryAdmController;
@@ -135,6 +136,12 @@ Route::middleware([AuthMiddleware::class, RefershTokenMiddleware::class])->group
     Route::post('/progress/project/saveImage/{id}', [ProgressController::class, 'storeImage'])->name('progress.storeImage');
     Route::post('/progress/project/updateImage/{id}', [ProgressController::class, 'updateImage'])->name('progress.updateImage');
     // Route::get('/activity-project/{id}', [ActivityController::class, 'activity_project'])->name('activity.project');
+
+    // CA
+    Route::get('ca', [CharteredAccountantController::class, 'index'])->name('ca.index');
+    Route::get('ca/form', [CharteredAccountantController::class, 'create'])->name('ca.create');
+    Route::get('ca/project', [CharteredAccountantController::class, 'indexCaProject'])->name('ca.project');
+    Route::get('ca/project/{id}', [CharteredAccountantController::class, 'show'])->name('ca.project.detail');
 });
 
 Route::get('test', function () {

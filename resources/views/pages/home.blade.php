@@ -189,6 +189,7 @@
     let total_no_process = data.total_is_process_false;
 
     $(document).ready(function () {
+        console.log(@json(session('user')));
         $('#total-aktivitas').text(total + " Aktivitas");
         $('#aktivitas-perbulan').text(monthly.length + " Aktivitas");
         $('#sedang-bertugas').text(total_is_process + " Karyawan");

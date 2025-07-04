@@ -81,13 +81,17 @@
                                     }else if($act['status'] == 'ON PROGRESS'){
                                         $badge_bg = 'bg-info';
                                     }
+
+                                    // $project_leader_status = session('user.id') == $project['project_leader_id'] ? true : false;
+                                    $author_status = $act['author_id'] == session('user.id') ? true : false;
+                                    $tooltip = $author_status ? 'Status = Author' : 'Status = Not Author';
                                 @endphp
-                                <tr>
+                                <tr data-tooltip="{{ $tooltip }}">
                                     <td class="text-center">{{ \Carbon\Carbon::parse($act['start_date'])->translatedFormat('d-m-Y') }}</td>
                                     <td>{{ $act['project_name'] }}</td>
                                     <td>{{ $act['title'] }}</td>
                                     <td class="text-center">
-                                        @if(session('user.role') == 'SUPERADMIN')
+                                        @if(session('user.role') == 'SUPERADMIN' || $author_status)
                                         <button class="badge {{ $badge_bg }} border-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             {{ $act['status'] ?? 'Undefined' }}
                                         </button>
