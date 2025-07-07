@@ -256,7 +256,7 @@ class ProjectController extends Controller
 
         if ($response->json()['status'] !== 201) {
             $errors = $response->json()['errors'];
-            dd($errors);
+            // dd($errors);
             return redirect()->back()->withInput()->withErrors($errors);
         }
 
@@ -271,7 +271,7 @@ class ProjectController extends Controller
         // dd($returnAddTeams->getData());
         if ($returnAddTeams->getData()->status == 'error') {
             $errors = $returnAddTeams->json()['message'];
-            dd($errors);
+            // dd($errors);
             return redirect()->back()->withInput()->withErrors($errors);
         }
 

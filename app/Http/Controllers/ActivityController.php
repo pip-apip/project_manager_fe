@@ -221,8 +221,8 @@ class ActivityController extends Controller
                 ]);
 
                 if ($responseTeam->json()['status'] === 400 || $responseTeam->json()['status'] === 500) {
-                    // return redirect()->back()->withErrors('Failed to fetch activity data.');
-                    dd($responseTeam->json());
+                    return redirect()->back()->with('error', 'Failed to fetch activity data.');
+                    // dd($responseTeam->json());
                 }
             }
         }
