@@ -503,10 +503,12 @@ class ProjectController extends Controller
         }
 
         $project = $responseProject->json()['data'][0];
-
-        if($project['project_leader_id'] !== session('user.id') || session('user.role') !== 'SUPERADMIN'){
-            return redirect()->back()->with('error', 'You cannot delete this project because you are the project leader.');
+        if(session('user.role') !== 'SUPERADMIN'){
+            if($project['project_leader_id'] !== session('user.id')){
+                return redirect()->back()->with('error', 'You cannot delete this project because you are the project leader.');
+            }
         }
+
 
         $responseDelete = Http::withToken($accessToken)->delete(env('API_BASE_URL').'/projects/'.$id);
 
