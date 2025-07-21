@@ -172,13 +172,14 @@ class CompanyController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id){
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'address' => 'required|string',
-            'director_name' => 'required|string|max:100',
-            'director_phone' => 'required|string|max:20',
-            'director_signature' => 'sometimes|mimes:jpeg,png,jpg|max:2048',
-        ]);
+
+        // $validated = $request->validate([
+        //     'name' => 'required|string|max:100',
+        //     'address' => 'required|string',
+        //     'director_name' => 'required|string|max:100',
+        //     'director_phone' => 'required|string|max:20',
+        //     'director_signature' => 'sometimes|mimes:jpeg,png,jpg|max:2048',
+        // ]);
 
         $accessToken = session('user.access_token');
         $file = $request->file('director_signature');
@@ -193,21 +194,25 @@ class CompanyController extends Controller
                 ->attach('director_signature', file_get_contents($file), $file->getClientOriginalName())
                 ->asMultipart()
                 ->post(env('API_BASE_URL')."/companies/{$id}", [
-                    ['name' => 'name', 'contents' => $validated['name']],
-                    ['name' => 'address', 'contents' => $validated['address']],
-                    ['name' => 'director_name', 'contents' => $validated['director_name']],
-                    ['name' => 'director_phone', 'contents' => $validated['director_phone']],
+                    ['name' => 'name', 'contents' => $request->input('name')],
+                    ['name' => 'address', 'contents' => $request->input('address')],
+                    ['name' => 'director_name', 'contents' => $request->input('director_name')],
+                    ['name' => 'director_phone', 'contents' => $request->input('director_phone')],
                 ]);
         } else {
-            // If no file, just send JSON payload
             $response = $requestHttp
-                ->post(env('API_BASE_URL')."/companies/{$id}", $validated);
-                // dd($response->json());
+                ->post(env('API_BASE_URL')."/companies/{$id}", $request->only([
+                    'name',
+                    'address',
+                    'director_name',
+                    'director_phone'
+                ]));
         }
+
 
         if ($response->json()['status'] == 400) {
             $errors = $response->json()['errors'];
-            return redirect()->back()->withInput()->withErrors($errors);
+            return redirect()->back()->withInput()->with('errors', $errors);
         }
         return redirect()->route('company.index')->with('success', 'Company updated successfully.');
     }

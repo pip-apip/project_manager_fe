@@ -131,11 +131,14 @@ Route::middleware([AuthMiddleware::class, RefershTokenMiddleware::class])->group
 
     // Progress
     Route::get('progress', [ProgressController::class, 'index'])->name('progress.index');
+    Route::get('progress-2', [ProgressController::class, 'kanban'])->name('progress.kanban');
     Route::get('progress/project/{id}', [ProgressController::class, 'show'])->name('progress.project');
     Route::post('progress/project/{id}/save', [ProgressController::class, 'store'])->name('progress.store');
     Route::post('/progress/project/saveImage/{id}', [ProgressController::class, 'storeImage'])->name('progress.storeImage');
     Route::post('/progress/project/updateImage/{id}', [ProgressController::class, 'updateImage'])->name('progress.updateImage');
     // Route::get('/activity-project/{id}', [ActivityController::class, 'activity_project'])->name('activity.project');
+    Route::post('progress/filter', [ProgressController::class, 'filter'])->name('progress.filter');
+    Route::get('progress/reset', [ProgressController::class, 'reset'])->name('progress.reset');
 
     // CA
     Route::get('ca', [CharteredAccountantController::class, 'index'])->name('ca.index');

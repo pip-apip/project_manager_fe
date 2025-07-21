@@ -63,6 +63,92 @@ class ProgressController extends Controller
         return view('pages.progress.index', compact('results'))->with('title', 'progress');
     }
 
+    public function kanban()
+    {
+        if (!request()->has('project_id')) {
+            session()->forget('project_id');
+        }
+        $page = request('page', 1);
+        $perPage = request()->has('per_page') ? request('per_page') : 10;
+
+        $params = [
+            'limit' => $perPage,
+            'page' => $page,
+        ];
+
+        if (session('user.role') != 'SUPERADMIN' && session('user.role') != 'ADMIN') {
+            $project_ids = session('user.project_id', []);
+            $params['id'] = is_array($project_ids) ? implode(',', $project_ids) : $project_ids;
+        }else{
+            // dd(session()->all());
+            // if(session('project_id')) {
+                $params['id'] = session('project_id');
+            // }
+        }
+
+        $queryParams = http_build_query(array_merge($params, ['limit' => 1000]));
+        $allProjects = Http::withToken($this->accessToken)->get(env('API_BASE_URL').'/projects/search?' . $queryParams);
+        // dd($allProjects->json());
+        // $allProjects = Http::withToken($this->accessToken)->get(env('API_BASE_URL').'/projects');
+        if ($allProjects->json()['status'] !== 200) {
+            return redirect()->back()->withErrors('Failed to fetch project data.');
+        }
+        $projects = $allProjects->json()['data'] ?? [];
+
+        $activities = [
+            'ON PROGRESS' => [],
+            'WAITING' => [],
+            'DONE' => [],
+        ];
+
+        if (session('project_id')) {
+            $getActivity = Http::withToken($this->accessToken)->get(env('API_BASE_URL') . '/activities/search?project_id=' . session('project_id'));
+            if ($getActivity->json()['status'] !== 200) {
+                return redirect()->back()->withErrors('Failed to fetch activity data.');
+            }
+            $results = $getActivity->json()['data'] ?? [];
+            foreach ($results as $activity) {
+                $status = $activity['status'];
+                if (isset($activities[$status])) {
+                    $activities[$status][] = $activity;
+                }
+            }
+            // dd($activities);
+        }
+
+        // $total = $responseProject->json()['pagination']['total'] ?? null;
+        // $results = '';
+        // if (!is_array($responseProject->json()['data']) || empty($responseProject->json()['data'])) {
+        //     $results = [];
+        // }else{
+        //     $results = new LengthAwarePaginator(
+        //         collect($responseProject->json()['data']),
+        //         $total,
+        //         $perPage,
+        //         $page,
+        //         ['path' => url('progress')]
+        //     );
+        // }
+
+        return view('pages.progress.kanban', compact('projects', 'activities'))->with('title', 'progress');
+    }
+
+    public function filter(Request $request)
+    {
+        $project_id = $request->input('project_id', '');
+
+        session(['project_id' => $project_id]);
+
+        // return redirect()->route('project.index', ['search' => $q, 'project_id' => $project_id]);
+        return redirect()->route('progress.kanban', ['project_id' => $project_id]);
+    }
+
+    public function reset()
+    {
+        session()->forget('project_id');
+        return redirect()->route('progress.kanban');
+    }
+
     /**
      * Show the form for creating a new resource.
      */
