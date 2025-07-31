@@ -157,7 +157,9 @@ class CategoryActController extends Controller
         if ($response->json()['status'] !== 200 && $response->json()['status'] !== 201) {
             $errors = $response->json()['errors'];
 
-            return redirect()->back()->withInput()->withErrors($errors);
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($errors);
         }
 
         return redirect()->route('categoryAct.index')->with('success', 'Category Activity created successfully.');

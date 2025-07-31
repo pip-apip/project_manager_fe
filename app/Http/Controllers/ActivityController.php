@@ -17,6 +17,7 @@ class ActivityController extends Controller
     {
         $checkIsProcess = Http::withToken(session('user.access_token'))->get(env('API_BASE_URL').'/users/'. session('user.id'));
         $this->isProcess = $checkIsProcess->json()['data'][0]['is_process'] ?? null;
+        // dd(session('currentRoute'), session('lastRoute'));
     }
 
     public function index()
@@ -282,33 +283,53 @@ class ActivityController extends Controller
     public function storeDoc(Request $request)
     {
         $accessToken = session('user.access_token');
-
         $http = Http::withToken($accessToken);
 
-        // Attach text fields
-        $http->attach('title', $request->input('title'))
-            ->attach('description', $request->input('description'))
-            ->attach('tags', $request->input('tags'))
-            ->attach('activity_id', $request->input('activity_id'));
+        // Start building the multipart request
+        $multipart = [];
 
-        // Attach each file
+        // Basic fields
+        $multipart[] = ['name' => 'title', 'contents' => $request->input('title')];
+        $multipart[] = ['name' => 'location', 'contents' => $request->input('location')];
+        $multipart[] = ['name' => 'date', 'contents' => date('Y-m-d', strtotime($request->input('date')))];
+        $multipart[] = ['name' => 'activity_id', 'contents' => $request->input('activity_id')];
+
+        // Arrays: decode from JSON and add each item individually
+        $agenda = json_decode($request->input('agenda'), true) ?? [];
+        foreach ($agenda as $index => $item) {
+            $multipart[] = ['name' => "agenda[$index]", 'contents' => $item];
+        }
+
+        $activity = json_decode($request->input('activity'), true) ?? [];
+        foreach ($activity as $index => $item) {
+            $multipart[] = ['name' => "activity[$index]", 'contents' => $item];
+        }
+
+        $person = json_decode($request->input('person'), true) ?? [];
+        foreach ($person as $index => $item) {
+            $multipart[] = ['name' => "meet_of_person[$index]", 'contents' => $item];
+        }
+
+        $tags = json_decode($request->input('tags'), true) ?? [];
+        foreach ($tags as $index => $item) {
+            $multipart[] = ['name' => "tags[$index]", 'contents' => $item];
+        }
+
+        // Files
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $index => $file) {
-                $http->attach(
-                    "files[$index]",                    // e.g., files[0], files[1]
-                    file_get_contents($file->getRealPath()),
-                    $file->getClientOriginalName()
-                );
+                $multipart[] = [
+                    'name'     => "files[$index]",
+                    'contents' => fopen($file->getRealPath(), 'r'),
+                    'filename' => $file->getClientOriginalName()
+                ];
             }
         }
 
-        $response = $http->post(env('API_BASE_URL').'/activity-docs');
-
-        if ($response->json()['status'] === 201) {
-            $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. session('user.id'), [
-                'is_process' => FALSE,
-            ]);
-        }
+        // Send the request
+        $response = Http::withToken($accessToken)
+            ->asMultipart()
+            ->post(env('API_BASE_URL') . '/activity-docs', $multipart);
 
         $responseData = $response->json();
 
@@ -317,6 +338,13 @@ class ActivityController extends Controller
                 'status' => $responseData['status'],
                 'message' => $responseData['message'] ?? 'An error occurred',
                 'errors' => $responseData['errors'] ?? []
+            ]);
+        }
+
+        // Optional: patch user status
+        if ($responseData['status'] === 201) {
+            Http::withToken($accessToken)->patch(env('API_BASE_URL') . '/users/' . session('user.id'), [
+                'is_process' => false,
             ]);
         }
 
@@ -327,40 +355,60 @@ class ActivityController extends Controller
         ]);
     }
 
+
     /**
      * Update a document.
      */
 
     public function updateDoc(Request $request, string $id)
     {
+        // return response()->json($request->all());
         $accessToken = session('user.access_token');
-        // $debugData = [];
 
-        $http = Http::withToken($accessToken);
+        $multipart = [
+            ['name' => 'title', 'contents' => $request->input('title')],
+            ['name' => 'location', 'contents' => $request->input('location')],
+            ['name' => 'date', 'contents' => date('Y-m-d', strtotime($request->input('date')))],
+            // ['name' => 'tags', 'contents' => $request->input('tags')],
+        ];
 
-        // Attach text fields
-        $http->attach('title', $request->input('title'))
-            ->attach('description', $request->input('description'))
-            ->attach('tags', $request->input('tags'));
-
-        // 1. Debug file baru
-        if ($request->hasFile('new_files')) {
-            foreach ($request->file('new_files') as $index => $file) {
-                // $debugData[] = [
-                //     'type' => 'new',
-                //     'original_name' => $file->getClientOriginalName(),
-                //     'size_kb' => round($file->getSize() / 1024, 2),
-                //     'mime_type' => $file->getMimeType(),
-                // ];
-                $http->attach(
-                    "files[$index]",
-                    file_get_contents($file->getRealPath()),
-                    $file->getClientOriginalName()
-                );
+        $agenda = json_decode($request->input('agenda'), true) ?? [];
+        if(empty($agenda)){
+            $multipart[] = ['name' => 'agenda', 'contents' => ""];
+        }else{
+            foreach ($agenda as $index => $item) {
+                $multipart[] = ['name' => "agenda[$index]", 'contents' => $item];
             }
         }
 
-        // 2. Debug file update dan path lama
+        $activity = json_decode($request->input('activity'), true) ?? [];
+        foreach ($activity as $index => $item) {
+            $multipart[] = ['name' => "activity[$index]", 'contents' => $item];
+        }
+
+        $person = json_decode($request->input('person'), true) ?? [];
+        foreach ($person as $index => $item) {
+            $multipart[] = ['name' => "meet_of_person[$index]", 'contents' => $item];
+        }
+
+        $tags = json_decode($request->input('tags'), true) ?? [];
+        foreach ($tags as $index => $item) {
+            $multipart[] = ['name' => "tags[$index]", 'contents' => $item];
+        }
+        // return response()->json($multipart);
+
+        // ✅ Handle new files
+        if ($request->hasFile('new_files')) {
+            foreach ($request->file('new_files') as $index => $file) {
+                $multipart[] = [
+                    'name' => "files[$index]",
+                    'contents' => fopen($file->getRealPath(), 'r'),
+                    'filename' => $file->getClientOriginalName()
+                ];
+            }
+        }
+
+        // ✅ Handle updated files and replacement paths
         $updateFiles = $request->file('update_files');
         $replacePaths = $request->input('replace_paths');
         $updateIndexes = $request->input('update_indexes');
@@ -370,52 +418,55 @@ class ActivityController extends Controller
                 $index = $updateIndexes[$i] ?? 'unknown';
                 $oldPath = $replacePaths[$i] ?? null;
 
-                // $debugData[] = [
-                //     'type' => 'update',
-                //     'index' => $index,
-                //     'original_name' => $file->getClientOriginalName(),
-                //     'replaced_old_path' => $oldPath,
-                // ];
+                if ($oldPath) {
+                    $multipart[] = ['name' => "replace_files[$index]", 'contents' => $oldPath];
+                }
 
-                $http->attach("replace_files[$index]", $oldPath);
-
-                $http->attach(
-                    "files[$index]",
-                    file_get_contents($file->getRealPath()),
-                    $file->getClientOriginalName()
-                );
+                $multipart[] = [
+                    'name' => "files[$index]",
+                    'contents' => fopen($file->getRealPath(), 'r'),
+                    'filename' => $file->getClientOriginalName()
+                ];
             }
         }
 
-        // 3. Debug deleted files
+        // ✅ Handle removed files
         if ($request->has('remove_files')) {
             foreach ($request->input('remove_files') as $index => $path) {
-                // $debugData[] = [
-                //     'type' => 'deleted',
-                //     'deleted_path' => $path,
-                // ];
-                $http->attach("remove_files[$index]", $path);
+                $multipart[] = ['name' => "remove_files[$index]", 'contents' => $path];
             }
         }
 
-        $response = $http->post(env('API_BASE_URL').'/activity-docs/'. $id);
+        try {
+            $response = Http::withToken($accessToken)
+                ->asMultipart()
+                ->post(env('API_BASE_URL') . '/activity-docs/' . $id, $multipart);
 
-        $responseData = $response->json();
+            $responseData = $response->json();
 
-        if (in_array($responseData['status'], [400, 500])) {
+            if (in_array($responseData['status'], [400, 500])) {
+                return response()->json([
+                    'status' => $responseData['status'],
+                    'message' => $responseData['message'] ?? 'An error occurred',
+                    'errors' => $responseData['errors'] ?? []
+                ]);
+            }
+
             return response()->json([
-                'status' => $responseData['status'],
-                'message' => $responseData['message'] ?? 'An error occurred',
-                'errors' => $responseData['errors'] ?? []
+                'status' => 201,
+                'message' => 'Document updated successfully.',
+                'data' => $responseData
+            ]);
+
+        } catch (RequestException $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Failed to send request to API.',
+                'errors' => [$e->getMessage()]
             ]);
         }
-
-        return response()->json([
-            'status' => 201,
-            'message' => 'Document updated successfully.',
-            'data' => $responseData
-        ]);
     }
+
 
 
 

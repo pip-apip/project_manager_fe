@@ -151,7 +151,7 @@
                             </div>
 
                             <div class="col-md-2">
-                                <label>Member Aktivitas <code>*</code></label>
+                                <label>Member Aktivitas </label>
                             </div>
                             <div class="form-group col-md-10">
                                 <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#teamModal" onclick="teamModal()">Tambah Member</button> <span id="countMember"> Total : 0 Member  </span>

@@ -33,7 +33,7 @@
                                 <label>Proyek <code>*</code></label>
                             </div>
                             <fieldset class="form-group col-md-10">
-                                <select class="form-select" id="project_id" name="project_id">
+                                <select class="form-select @error('project_id') is-invalid @enderror" id="project_id" name="project_id">
                                     <option value="#">Pilih Proyek</option>
                                     @foreach ($projects as $project)
                                     <option value="{{ $project['id'] }}" {{ old('project_id', $category ? $category['project_id'] : '') == $project['id'] ? 'selected' : '' }}>
@@ -42,6 +42,9 @@
                                     @endforeach
                                     <option value="0">Lain - lain</option>
                                 </select>
+                                @error('project_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </fieldset>
                             <div class="col-md-2">
                                 <label>Nama Kategori <code>*</code></label>
