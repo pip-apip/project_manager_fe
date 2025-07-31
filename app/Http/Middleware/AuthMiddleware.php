@@ -40,6 +40,7 @@ class AuthMiddleware
         $currentRoute .= $id ? ',' . $id : '';
 
         $previousRoute = session('currentRoute');
+        // dd($previousRoute, $currentRoute);
 
         if ($previousRoute !== $currentRoute) {
             session()->put('lastRoute', $previousRoute);

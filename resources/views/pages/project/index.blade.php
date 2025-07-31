@@ -95,7 +95,12 @@
                                 class="mb-4 col-12 col-lg-11">
                                 @csrf
                                 <div class="row">
-                                    <div class="col-lg-3 col-6">
+                                    <fieldset class="form-group" style="width: 120px">
+                                        <select class="form-select" id="project_year" name="project_year">
+                                            <option value="">2025</option>
+                                        </select>
+                                    </fieldset>
+                                    {{-- <div class="col-lg-3 col-6">
                                         <div class="form-group">
                                             <input type="date" class="form-control" name="start_date"
                                                 value="{{ session()->has('start_date') ? session('start_date') : '' }}">
@@ -106,7 +111,7 @@
                                             <input type="date" class="form-control" name="end_date"
                                                 value="{{ session()->has('end_date') ? session('end_date') : '' }}">
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-lg-5 col-8">
                                         <div class="input-group">
                                             <input type="text" class="form-control" name="q"
@@ -128,8 +133,8 @@
                             <table class="table table-striped" id="table">
                                 <thead>
                                     <tr>
-                                        <th width="12%" class="text-center">Mulai</th>
-                                        <th width="12%" class="text-center">Selesai</th>
+                                        <th width="5%" class="text-center">Tahun</th>
+                                        <th width="10%" class="text-center">Code Paket</th>
                                         <th>Nama Proyek</th>
                                         <th width="20%">Nama Perusahaan</th>
                                         <th width="10%" class="text-center">Status</th>
@@ -163,12 +168,14 @@
                                                         ? ''
                                                         : 'data-tooltip="' . $tooltip . '"';
                                             @endphp
-                                            <tr {!! $tooltipAttr !!}>
+                                            {{-- <tr {!! $tooltipAttr !!}> --}}
+                                            <tr>
                                                 <td class="text-center">
-                                                    {{ \Carbon\Carbon::parse($project['start_date'])->translatedFormat('d-m-Y') }}
+                                                    {{ \Carbon\Carbon::parse($project['start_date'])->translatedFormat('Y') }}
                                                 </td>
                                                 <td class="text-center">
-                                                    {{ \Carbon\Carbon::parse($project['end_date'])->translatedFormat('d-m-Y') }}
+                                                    {{-- {{ \Carbon\Carbon::parse($project['end_date'])->translatedFormat('d-m-Y') }} --}}
+                                                    {{ $project['code'] }}
                                                 </td>
                                                 <td>{{ $project['name'] }}</td>
                                                 <td>{{ $project['company_name'] }}</td>
@@ -301,10 +308,10 @@
                                 <div class="form-group">
                                     <p class="form-control-static" id="ppk_name_detail"></p>
                                 </div>
-                                {{-- <label><b> Nilai Kontrak : </b></label>
-                            <div class="form-group">
-                                <p class="form-control-static" id="project_value_detail"></p>
-                            </div> --}}
+                                <label><b> Nilai Kontrak : </b></label>
+                                <div class="form-group">
+                                    <p class="form-control-static" id="project_value_detail"></p>
+                                </div>
                             </div>
                             <hr>
                             <div class="col-sm-5">
