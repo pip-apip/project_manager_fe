@@ -395,10 +395,10 @@
                                                 autocomplete="off" />
                                         </div>
 
-                                        <div class="col-md-2">
+                                        <div class="col-md-2" style="display: none">
                                             <label>Deskripsi <code>*</code></label>
                                         </div>
-                                        <div class="form-group col-md-10">
+                                        <div class="form-group col-md-10" style="display: none">
                                             <div id="quillEditor" style="height: 300px;"></div>
                                         </div>
                                         <div class="col-md-2">
@@ -475,7 +475,7 @@
                                     <p class="form-control-static" id="title_show"></p>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-12" style="display: none">
                                         <label><b>Deskripsi : </b></label>
                                         <div class="form-group"
                                             style="padding: 10px 10px 10px 30px; border: 1px solid #000; border-radius: 5px;">
