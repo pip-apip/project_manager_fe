@@ -264,11 +264,17 @@
                             <div class="col-sm-8 col-8">
                                 <h1>Detail <span class="d-none d-md-inline-block">Aktivitas</span></h1>
                             </div>
-                            <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
+                            {{-- <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
                                 <a href="{{ isset($lastRoute[0], $lastRoute[1]) ? route($lastRoute[0], $lastRoute[1]) : route('activity.index') }}"
                                     class="btn btn-secondary btn-sm">
                                     <i class="fa-solid fa-angle-left"></i> <span
                                         class="d-none d-md-inline-block">{{ json_encode($lastRoute) }}</span>
+                                </a>
+                            </div> --}}
+                            <div class="col-sm-4 col-4 d-flex justify-content-end align-items-center">
+                                <a href="{{ route('activity.index') }}" class="btn btn-secondary btn-sm">
+                                    <i class="fa-solid fa-angle-left"></i> <span
+                                        class="d-none d-md-inline-block">Kembali</span>
                                 </a>
                             </div>
                         </div>
