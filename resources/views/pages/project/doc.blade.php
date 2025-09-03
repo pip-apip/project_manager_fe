@@ -615,6 +615,7 @@
     }
 
     async function uploadFileInChunks(file) {
+        buttonLoadingStart('submitButton');
         const chunkSize = 1024 * 1024; // 1 MB
         const totalChunks = Math.ceil(file.size / chunkSize);
         const uploadUrl = "{{ env('API_BASE_URL') }}/upload-chunks";
@@ -648,6 +649,7 @@
 
                 if (!response.ok) {
                     throw new Error(result.error || "Upload error");
+                    buttonLoadingEnd('submitButton');
                 }
 
                 // Update progress bar
@@ -655,6 +657,7 @@
 
                 if (result.message === "Upload complete" && result.data.file) {
                     uploadedFileNameInput.value = result.data.file;
+                    buttonLoadingEnd('submitButton');
                 }
 
                 console.log(result);
