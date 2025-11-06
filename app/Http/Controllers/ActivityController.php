@@ -179,7 +179,7 @@ class ActivityController extends Controller
      */
     public function store(Request $request)
     {
-
+        dd($request->all());
         if($this->isProcess && session('user.role') !== 'SUPERADMIN'){
             return redirect()->route('activity.index')->with('error', 'Anda memiliki proses aktivitas yang sedang berlangsung. Silakan selesaikan terlebih dahulu.');
         }
