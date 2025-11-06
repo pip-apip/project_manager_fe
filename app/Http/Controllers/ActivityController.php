@@ -184,13 +184,6 @@ class ActivityController extends Controller
             return redirect()->route('activity.index')->with('error', 'Anda memiliki proses aktivitas yang sedang berlangsung. Silakan selesaikan terlebih dahulu.');
         }
         $activity_teams = json_decode($request->input('activityTeam'), true);
-        // dd($activity_teams ?? null);
-        // $request->validate([
-        //     'project_id' => ['required', 'not_in:#'],
-        //     'title' => 'required|string|max:255',
-        //     'start_date' => 'required|date',
-        //     'end_date' => 'required|date',
-        // ]);
 
         $accessToken = session('user.access_token');
 
@@ -203,14 +196,14 @@ class ActivityController extends Controller
             'author_id' => session('user.id'),
         ]);
 
-        $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. session('user.id'), [
-            'is_process' => TRUE,
-        ]);
-
         if ($response->json()['status'] !== 201) {
             $errors = $response->json()['errors'];
             return redirect()->back()->withInput()->withErrors($errors);
         }
+
+        $responseIsProcess = Http::withToken($accessToken)->patch(env('API_BASE_URL').'/users/'. session('user.id'), [
+            'is_process' => TRUE,
+        ]);
 
         $latestActivity = $response->json()['data']['id'];
 
