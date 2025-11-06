@@ -127,7 +127,7 @@
                                 <label>Kategori Aktivitas <code>*</code></label>
                             </div>
                             <fieldset class="form-group col-md-10">
-                                <select class="form-select" id="activity_category_id" name="activity_category_id">
+                                <select class="form-select" id="activity_category_id" name="activity_category_id" required>
 
                                 </select>
                             </fieldset>
@@ -167,6 +167,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div> --}}
+
                             <div class="col-sm-12 offset-sm-2 d-flex justify-content-start mt-3">
                                 <button type="submit"
                                     class="btn btn-primary me-1 mb-1" id="submitButton">Simpan</button>
